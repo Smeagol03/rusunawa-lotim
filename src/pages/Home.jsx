@@ -1,5 +1,5 @@
 import Navbar from "/src/komponen-home/Navbar";
-import Hero from "/src/komponen-home/hero";
+import Hero from "/src/komponen-home/Hero";
 import Fasilitas from "/src/komponen-home/Fasilitas";
 import Caradaftar from "/src/komponen-home/Caradaftar";
 import About from "/src/komponen-home/About";
