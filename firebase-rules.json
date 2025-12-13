@@ -1,0 +1,14 @@
+{
+  "rules": {
+    ".read": "auth.uid === 'UID_ADMIN_ANDA'",
+    ".write": "auth.uid === 'UID_ADMIN_ANDA'",
+
+    "pendaftar": {
+      ".read": "auth.uid === 'UID_ADMIN_ANDA'",
+      
+      "$nik": {
+        ".write": "newData.exists() && !data.exists()"
+      }
+    }
+  }
+}
