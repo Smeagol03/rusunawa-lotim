@@ -1,12 +1,13 @@
 import { ref, set, onValue, update, remove } from "firebase/database";
 import { database } from "./firebase";
+import { logAktivitas, TIPE_NOTIFIKASI } from "./notifikasi";
 
 /**
  * Menyimpan data pendaftar ke Realtime Database menggunakan NIK sebagai key
  * @param {Object} data - Data pendaftar dari form
  * @returns {Promise<void>}
  */
-export const simpanPendaftar = (data) => {
+export const simpanPendaftar = async (data) => {
   if (!data.nik) {
     return Promise.reject(new Error("NIK tidak ditemukan"));
   }
@@ -24,7 +25,15 @@ export const simpanPendaftar = (data) => {
     status: "menunggu_verifikasi", // Default status
   };
 
-  return set(pendaftarRef, dataToSave).catch((error) => {
+  try {
+    await set(pendaftarRef, dataToSave);
+    // Log aktivitas
+    await logAktivitas(
+      TIPE_NOTIFIKASI.PENDAFTAR_BARU,
+      `${data.nama} mendaftar sebagai calon penghuni`,
+      { nama: data.nama, nik: data.nik }
+    );
+  } catch (error) {
     // Tangkap error jika permission denied (biasanya karena NIK sudah ada dan diblokir rules)
     if (
       error.code === "PERMISSION_DENIED" ||
@@ -35,7 +44,7 @@ export const simpanPendaftar = (data) => {
       );
     }
     throw error;
-  });
+  }
 };
 
 /**
@@ -86,7 +95,14 @@ export const verifikasiPendaftar = async (dataPendaftar, nomorUnit) => {
   // 2. Hapus dari pendaftar (sesuai request user agar tidak menumpuk)
   updates[`/pendaftar/${dataPendaftar.nik}`] = null;
 
-  return update(ref(database), updates);
+  await update(ref(database), updates);
+
+  // Log aktivitas
+  await logAktivitas(
+    TIPE_NOTIFIKASI.VERIFIKASI,
+    `${dataPendaftar.nama} diverifikasi dan masuk ke Unit ${nomorUnit}`,
+    { nama: dataPendaftar.nama, nik: dataPendaftar.nik, unit: nomorUnit }
+  );
 };
 
 /**
@@ -111,11 +127,23 @@ export const updateDataPenghuni = async (nik, newData) => {
  * @param {string} nik
  * @param {string} newUnit
  */
-export const updateUnitPenghuni = async (nik, newUnit) => {
+export const updateUnitPenghuni = async (
+  nik,
+  newUnit,
+  namapenghuni = "Penghuni"
+) => {
   if (!nik || !newUnit) throw new Error("Data tidak lengkap");
   const updates = {};
   updates[`/penghuni/${nik}/nomor_unit`] = newUnit;
-  return update(ref(database), updates);
+
+  await update(ref(database), updates);
+
+  // Log aktivitas
+  await logAktivitas(
+    TIPE_NOTIFIKASI.PINDAH_UNIT,
+    `${namapenghuni} dipindahkan ke Unit ${newUnit}`,
+    { nik, unit_baru: newUnit }
+  );
 };
 
 /**
@@ -138,7 +166,18 @@ export const hapusPenghuni = async (dataPenghuni) => {
   // 2. Hapus dari node penghuni (Otomatis unit jadi kosong karena referensinya hilang)
   updates[`/penghuni/${dataPenghuni.nik}`] = null;
 
-  return update(ref(database), updates);
+  await update(ref(database), updates);
+
+  // Log aktivitas
+  await logAktivitas(
+    TIPE_NOTIFIKASI.HAPUS_PENGHUNI,
+    `${dataPenghuni.nama} (Unit ${dataPenghuni.nomor_unit}) dipindahkan ke sampah`,
+    {
+      nama: dataPenghuni.nama,
+      nik: dataPenghuni.nik,
+      unit: dataPenghuni.nomor_unit,
+    }
+  );
 };
 
 /**
@@ -160,7 +199,14 @@ export const pindahkanKeSampah = async (dataPendaftar) => {
   // 2. Hapus dari pendaftar
   updates[`/pendaftar/${dataPendaftar.nik}`] = null;
 
-  return update(ref(database), updates);
+  await update(ref(database), updates);
+
+  // Log aktivitas
+  await logAktivitas(
+    TIPE_NOTIFIKASI.HAPUS_PENDAFTAR,
+    `Data pendaftar ${dataPendaftar.nama} dipindahkan ke sampah`,
+    { nama: dataPendaftar.nama, nik: dataPendaftar.nik }
+  );
 };
 
 // ... existing listener functions ...
@@ -219,7 +265,15 @@ export const pulihkanPendaftar = async (data) => {
     tanggal_dihapus: null,
   };
   updates[`/sampah_pendaftar/${data.nik}`] = null;
-  return update(ref(database), updates);
+
+  await update(ref(database), updates);
+
+  // Log aktivitas
+  await logAktivitas(
+    TIPE_NOTIFIKASI.PULIHKAN,
+    `Data pendaftar ${data.nama} dipulihkan dari sampah`,
+    { nama: data.nama, nik: data.nik }
+  );
 };
 
 // Restore Penghuni: Balik ke tabel PENDAFTAR (bukan penghuni, karena unit mungkin sudah penuh)
@@ -234,7 +288,15 @@ export const pulihkanPenghuni = async (data) => {
     tanggal_dihapus: null,
   };
   updates[`/sampah_penghuni/${data.nik}`] = null;
-  return update(ref(database), updates);
+
+  await update(ref(database), updates);
+
+  // Log aktivitas
+  await logAktivitas(
+    TIPE_NOTIFIKASI.PULIHKAN,
+    `Data penghuni ${data.nama} dipulihkan dari sampah`,
+    { nama: data.nama, nik: data.nik }
+  );
 };
 
 export const hapusPermanenPendaftar = async (nik) => {

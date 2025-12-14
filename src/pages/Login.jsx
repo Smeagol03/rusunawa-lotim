@@ -48,7 +48,7 @@ const LoginAdmin = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 font-sans">
+      <div className="py-10 flex items-center justify-center bg-gray-100 p-4 font-sans">
         <div className="w-full max-w-md bg-white rounded-xl shadow-md p-8">
           <div className="mb-6 text-center">
             <h3 className="text-2xl font-semibold text-gray-800 mb-2">

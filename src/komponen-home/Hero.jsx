@@ -14,7 +14,7 @@ const Hero = () => {
             className="relative left-[calc(50%-11rem)] aspect-1155/678 w-144.5 -translate-x-1/2 rotate-30 bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-288.75"
           />
         </div>
-        <div className="mx-auto max-w-3xl py-16 min-h-screen flex flex-col justify-center">
+        <div className="mx-auto max-w-3xl py-16 flex flex-col justify-center">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
             <div className="relative rounded-full px-4 py-1.5 text-2xl text-gray-600 ring-1 ring-emerald-500/20 hover:ring-emerald-500/40 bg-emerald-50/50">
               🏠 Pendaftaran Rusunawa Dibuka!{" "}

@@ -11,6 +11,7 @@ import KelolaPenghuni from "./pages/admin/KelolaPenghuni";
 import KelolaPendaftar from "./pages/admin/KelolaPendaftar";
 import KelolaUnit from "./pages/admin/KelolaUnit";
 import KeranjangSampah from "./pages/admin/KeranjangSampah";
+import Notifikasi from "./pages/admin/Notifikasi";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -37,6 +38,7 @@ createRoot(document.getElementById("root")).render(
             <Route path="pendaftar" element={<KelolaPendaftar />} />
             <Route path="sampah" element={<KeranjangSampah />} />
             <Route path="unit" element={<KelolaUnit />} />
+            <Route path="notifikasi" element={<Notifikasi />} />
           </Route>
         </Routes>
       </BrowserRouter>

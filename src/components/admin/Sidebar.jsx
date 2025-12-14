@@ -9,6 +9,7 @@ import {
   BuildingOffice2Icon,
   ArrowLeftOnRectangleIcon,
   XMarkIcon,
+  BellIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = ({ onClose }) => {
@@ -18,6 +19,7 @@ const Sidebar = ({ onClose }) => {
     { name: "Kelola Pendaftar", icon: NewspaperIcon, path: "/admin/pendaftar" },
     { name: "Kelola Unit", icon: BuildingOffice2Icon, path: "/admin/unit" },
     { name: "Keranjang Sampah", icon: TrashIcon, path: "/admin/sampah" },
+    { name: "Log Aktivitas", icon: BellIcon, path: "/admin/notifikasi" },
   ];
 
   const navigate = useNavigate();

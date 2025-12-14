@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   listenToSampahPendaftar,
   listenToSampahPenghuni,
@@ -12,6 +12,8 @@ import {
   ArrowPathIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
+import SearchInput from "/src/components/admin/SearchInput";
+import KonfirmasiModal from "/src/components/admin/KonfirmasiModal";
 
 const KeranjangSampah = () => {
   const [activeTab, setActiveTab] = useState("pendaftar"); // 'pendaftar' | 'penghuni'
@@ -19,6 +21,12 @@ const KeranjangSampah = () => {
   const [dataPenghuni, setDataPenghuni] = useState([]);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Modal State for layered confirmation
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     const unsubPendaftar = listenToSampahPendaftar((data) => {
@@ -36,12 +44,25 @@ const KeranjangSampah = () => {
     };
   }, []);
 
-  // Clear selection when tab changes
+  // Clear selection and search when tab changes
   useEffect(() => {
     setSelectedIds(new Set());
+    setSearchQuery("");
   }, [activeTab]);
 
   const currentData = activeTab === "pendaftar" ? dataPendaftar : dataPenghuni;
+
+  // Filtered data based on search query
+  const filteredData = useMemo(() => {
+    if (!searchQuery.trim()) return currentData;
+
+    const query = searchQuery.toLowerCase();
+    return currentData.filter(
+      (item) =>
+        item.nama?.toLowerCase().includes(query) ||
+        item.nik?.toLowerCase().includes(query)
+    );
+  }, [currentData, searchQuery]);
 
   // Toggle Selection
   const toggleSelect = (id) => {
@@ -88,15 +109,14 @@ const KeranjangSampah = () => {
     }
   };
 
-  const handleDeletePermanent = async () => {
+  // Open modal for delete confirmation
+  const handleDeletePermanentClick = () => {
     if (selectedIds.size === 0) return;
-    if (
-      !window.confirm(
-        `PERHATIAN: ${selectedIds.size} item akan dihapus PERMANEN dan TIDAK BISA DIKEMBALIKAN. Lanjutkan?`
-      )
-    )
-      return;
+    setIsDeleteModalOpen(true);
+  };
 
+  // Actual delete execution (called from modal)
+  const executeDeletePermanent = async () => {
     try {
       const promises = Array.from(selectedIds).map((id) => {
         return activeTab === "pendaftar"
@@ -134,13 +154,29 @@ const KeranjangSampah = () => {
               Pulihkan ({selectedIds.size})
             </button>
             <button
-              onClick={handleDeletePermanent}
+              onClick={handleDeletePermanentClick}
               className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium transition"
             >
               <TrashIcon className="w-4 h-4" />
               Hapus Permanen ({selectedIds.size})
             </button>
           </div>
+        )}
+      </div>
+
+      {/* Search Input */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="w-full md:w-72">
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Cari nama atau NIK..."
+          />
+        </div>
+        {searchQuery && (
+          <span className="bg-amber-100 text-amber-800 text-sm font-medium px-3 py-1 rounded-full">
+            Ditemukan: {filteredData.length}
+          </span>
         )}
       </div>
 
@@ -178,11 +214,11 @@ const KeranjangSampah = () => {
                   <input
                     type="checkbox"
                     checked={
-                      currentData.length > 0 &&
-                      selectedIds.size === currentData.length
+                      filteredData.length > 0 &&
+                      selectedIds.size === filteredData.length
                     }
                     onChange={toggleSelectAll}
-                    disabled={currentData.length === 0}
+                    disabled={filteredData.length === 0}
                     className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                   />
                 </th>
@@ -202,15 +238,19 @@ const KeranjangSampah = () => {
                     Memuat data...
                   </td>
                 </tr>
-              ) : currentData.length === 0 ? (
+              ) : filteredData.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-12 text-center">
                     <TrashIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">Keranjang sampah kosong.</p>
+                    <p className="text-gray-500">
+                      {searchQuery
+                        ? "Tidak ada hasil yang cocok."
+                        : "Keranjang sampah kosong."}
+                    </p>
                   </td>
                 </tr>
               ) : (
-                currentData.map((item) => (
+                filteredData.map((item) => (
                   <tr
                     key={item.nik}
                     className={`hover:bg-gray-50 transition-colors cursor-pointer ${
@@ -275,6 +315,17 @@ const KeranjangSampah = () => {
           memverifikasi ulang dan memilihkan unit baru untuk mereka.
         </p>
       </div>
+
+      {/* Layered Confirmation Modal */}
+      <KonfirmasiModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={executeDeletePermanent}
+        title="Hapus Data Permanen"
+        message="Data yang dihapus permanen tidak dapat dikembalikan lagi!"
+        confirmWord="KONFIRMASI"
+        itemCount={selectedIds.size}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { XMarkIcon, HomeIcon } from "@heroicons/react/24/outline";
-import { generateUnits } from "../../config/unitConfig";
+import { generateUnits } from "/src/config/unitConfig";
 
 const PilihUnitModal = ({ isOpen, onClose, onSelect, occupiedUnits = [] }) => {
   if (!isOpen) return null;
