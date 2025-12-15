@@ -1,3 +1,4 @@
+import Pelaporan from "./Pelaporan";
 import React, { useEffect, useState } from "react";
 import {
   listenToPenghuni,
@@ -83,6 +84,9 @@ const Dashboard = () => {
             </div>
           </div>
         ))}
+      </div>
+      <div id="laporan">
+        <Pelaporan />
       </div>
     </div>
   );

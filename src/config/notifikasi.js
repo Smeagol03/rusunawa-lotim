@@ -22,6 +22,7 @@ export const TIPE_NOTIFIKASI = {
   HAPUS_PENDAFTAR: "hapus_pendaftar",
   PULIHKAN: "pulihkan",
   HAPUS_PERMANEN: "hapus_permanen",
+  LAPORAN_BARU: "laporan_baru",
 };
 
 /**
@@ -62,6 +63,11 @@ export const NOTIFIKASI_CONFIG = {
     icon: "XCircleIcon",
     color: "text-gray-600",
     bg: "bg-gray-100",
+  },
+  laporan_baru: {
+    icon: "ExclamationCircleIcon",
+    color: "text-purple-600",
+    bg: "bg-purple-100",
   },
 };
 
