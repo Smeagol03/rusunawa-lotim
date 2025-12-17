@@ -150,6 +150,17 @@ export const AKTIVITAS_COLUMNS = [
 ];
 
 /**
+ * Kolom untuk export Laporan Keluhan
+ */
+export const LAPORAN_COLUMNS = [
+  { key: "nama", label: "Nama Pelapor", width: 25 },
+  { key: "nohp", label: "No. HP", width: 15 },
+  { key: "laporan", label: "Isi Laporan", width: 50 },
+  { key: "tanggal", label: "Tanggal", width: 20 },
+  { key: "status", label: "Status", width: 12 },
+];
+
+/**
  * Format tanggal untuk export
  */
 export const formatDateForExport = (dateString) => {
@@ -181,6 +192,9 @@ export const prepareDataForExport = (data, type) => {
     } else if (type === "aktivitas") {
       formatted.timestamp = formatDateForExport(item.timestamp);
       formatted.dibaca = item.dibaca ? "Sudah Dibaca" : "Belum Dibaca";
+    } else if (type === "laporan") {
+      formatted.tanggal = formatDateForExport(item.tanggal);
+      formatted.status = item.status === "read" ? "Sudah Dibaca" : "Baru";
     }
 
     // Flatten anggotaKeluarga array to separate columns for mail merge

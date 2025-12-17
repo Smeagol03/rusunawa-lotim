@@ -7,8 +7,14 @@ import {
   PhoneIcon,
   ClockIcon,
   ExclamationCircleIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import SearchInput from "/src/components/admin/SearchInput";
+import {
+  exportToExcel,
+  LAPORAN_COLUMNS,
+  prepareDataForExport,
+} from "/src/config/exportExcel";
 
 const Pelaporan = () => {
   const [laporanList, setLaporanList] = useState([]);
@@ -80,6 +86,45 @@ const Pelaporan = () => {
     });
   };
 
+  // Hapus semua laporan dengan konfirmasi ganda
+  const handleHapusSemua = async () => {
+    if (laporanList.length === 0) {
+      alert("Tidak ada laporan.");
+      return;
+    }
+    if (
+      !window.confirm(
+        `Yakin ingin menghapus SEMUA ${laporanList.length} laporan?`
+      )
+    )
+      return;
+
+    if (
+      !window.confirm(
+        `KONFIRMASI KEDUA: ${laporanList.length} laporan akan dihapus secara permanen. Lanjutkan?`
+      )
+    )
+      return;
+
+    try {
+      const deletePromises = laporanList.map((laporan) => {
+        const laporanRef = ref(database, `laporan/${laporan.id}`);
+        return remove(laporanRef);
+      });
+      await Promise.all(deletePromises);
+      alert(`Berhasil menghapus ${laporanList.length} laporan.`);
+    } catch (error) {
+      console.error("Error deleting all reports:", error);
+      alert("Gagal menghapus semua laporan: " + error.message);
+    }
+  };
+
+  // Export ke Excel
+  const handleExportExcel = () => {
+    const data = prepareDataForExport(laporanList, "laporan");
+    exportToExcel(data, LAPORAN_COLUMNS, "laporan_keluhan", "Laporan Keluhan");
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -101,6 +146,27 @@ const Pelaporan = () => {
             <p className="text-sm text-gray-500 mt-1">
               {filteredList.length} dari {laporanList.length} laporan
             </p>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2 mt-2">
+              {laporanList.length > 0 && (
+                <button
+                  onClick={handleHapusSemua}
+                  className="flex items-center gap-1 text-xs bg-red-600 text-white px-3 py-1.5 rounded-full hover:bg-red-700 transition"
+                >
+                  <TrashIcon className="w-3 h-3" />
+                  Hapus Semua
+                </button>
+              )}
+              {laporanList.length > 0 && (
+                <button
+                  onClick={handleExportExcel}
+                  className="flex items-center gap-1 text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full hover:bg-emerald-700 transition"
+                >
+                  <ArrowDownTrayIcon className="w-3 h-3" />
+                  Export Excel
+                </button>
+              )}
+            </div>
           </div>
           {/* Search Input */}
           <SearchInput
