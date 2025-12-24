@@ -177,9 +177,9 @@ const Notifikasi = () => {
           )}
           {notifikasi.length > 0 && (
             <button
-              onClick={() => {
+              onClick={async () => {
                 const data = prepareDataForExport(notifikasi, "aktivitas");
-                exportToExcel(
+                await exportToExcel(
                   data,
                   AKTIVITAS_COLUMNS,
                   "log_aktivitas",

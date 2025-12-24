@@ -120,9 +120,14 @@ const Pelaporan = () => {
   };
 
   // Export ke Excel
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     const data = prepareDataForExport(laporanList, "laporan");
-    exportToExcel(data, LAPORAN_COLUMNS, "laporan_keluhan", "Laporan Keluhan");
+    await exportToExcel(
+      data,
+      LAPORAN_COLUMNS,
+      "laporan_keluhan",
+      "Laporan Keluhan"
+    );
   };
 
   if (loading) {

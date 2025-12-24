@@ -1,41 +1,51 @@
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 /**
- * Export data ke file Excel (.xlsx)
+ * Export data ke file Excel (.xlsx) menggunakan exceljs
  * @param {Array} data - Array of objects to export
  * @param {Array} columns - Column definitions [{key, label, width?}]
  * @param {string} filename - Nama file tanpa extension
  * @param {string} sheetName - Nama sheet (default: "Data")
  */
-export const exportToExcel = (data, columns, filename, sheetName = "Data") => {
-  // Transform data sesuai kolom yang dipilih
-  const exportData = data.map((item) => {
-    const row = {};
+export const exportToExcel = async (data, columns, filename, sheetName = "Data") => {
+  // Buat workbook & worksheet
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(sheetName);
+
+  // Set kolom
+  worksheet.columns = columns.map((col) => ({
+    header: col.label,
+    key: col.key,
+    width: col.width || 15,
+  }));
+
+  // Tambah baris data
+  data.forEach((item) => {
+    // Pastikan nilai null/undefined jadi "-"
+    const rowData = {};
     columns.forEach((col) => {
-      row[col.label] = item[col.key] ?? "-";
+      rowData[col.key] = item[col.key] ?? "-";
     });
-    return row;
+    worksheet.addRow(rowData);
   });
 
-  // Buat worksheet
-  const ws = XLSX.utils.json_to_sheet(exportData);
-
-  // Set column widths
-  const colWidths = columns.map((col) => ({
-    wch: col.width || 15,
-  }));
-  ws["!cols"] = colWidths;
-
-  // Buat workbook
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  // Style header (opsional tapi bagus)
+  worksheet.getRow(1).font = { bold: true };
+  worksheet.getRow(1).fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFE9ECEF' }
+  };
 
   // Generate filename dengan tanggal
   const date = new Date().toISOString().slice(0, 10);
   const fullFilename = `${filename}_${date}.xlsx`;
 
-  // Download file
-  XLSX.writeFile(wb, fullFilename);
+  // Write to buffer and download
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+  saveAs(blob, fullFilename);
 };
 
 /**

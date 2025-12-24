@@ -182,9 +182,9 @@ const KelolaPenghuni = () => {
             )}
             {penghuni.length > 0 && (
               <button
-                onClick={() => {
+                onClick={async () => {
                   const data = prepareDataForExport(penghuni, "penghuni");
-                  exportToExcel(
+                  await exportToExcel(
                     data,
                     PENGHUNI_COLUMNS,
                     "penghuni",
