@@ -25,7 +25,6 @@ const LoginAdmin = () => {
       // AuthContext will detect change and we can redirect
       navigate("/admin");
     } catch (err) {
-      console.error("Login error:", err);
       // Custom error messages
       if (
         err.code === "auth/invalid-credential" ||

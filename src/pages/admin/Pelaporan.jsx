@@ -58,7 +58,6 @@ const Pelaporan = () => {
       const laporanRef = ref(database, `laporan/${id}`);
       await update(laporanRef, { status: "read" });
     } catch (error) {
-      console.error("Error updating status:", error);
       alert("Gagal mengubah status laporan.");
     }
   };
@@ -69,7 +68,6 @@ const Pelaporan = () => {
       const laporanRef = ref(database, `laporan/${id}`);
       await remove(laporanRef);
     } catch (error) {
-      console.error("Error deleting report:", error);
       alert("Gagal menghapus laporan.");
     }
   };
@@ -114,7 +112,6 @@ const Pelaporan = () => {
       await Promise.all(deletePromises);
       alert(`Berhasil menghapus ${laporanList.length} laporan.`);
     } catch (error) {
-      console.error("Error deleting all reports:", error);
       alert("Gagal menghapus semua laporan: " + error.message);
     }
   };

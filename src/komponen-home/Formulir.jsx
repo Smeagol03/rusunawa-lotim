@@ -2,6 +2,40 @@ import "/src/index.css";
 import React, { useState } from "react";
 import { simpanPendaftar } from "/src/config/database";
 
+/**
+ * Sanitasi input untuk mencegah XSS attacks
+ * Escape karakter HTML special
+ */
+const sanitizeInput = (str) => {
+  if (typeof str !== "string") return str;
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;")
+    .trim();
+};
+
+/**
+ * Sanitasi semua field dalam object
+ */
+const sanitizeFormData = (data) => {
+  const sanitized = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (Array.isArray(value)) {
+      sanitized[key] = value.map((item) =>
+        typeof item === "object" ? sanitizeFormData(item) : sanitizeInput(item)
+      );
+    } else if (typeof value === "object" && value !== null) {
+      sanitized[key] = sanitizeFormData(value);
+    } else {
+      sanitized[key] = sanitizeInput(value);
+    }
+  }
+  return sanitized;
+};
+
 const Formulir = () => {
   const [showSpouseData, setShowSpouseData] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -9,7 +43,7 @@ const Formulir = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData);
+    let data = Object.fromEntries(formData);
 
     // Collect family members data
     const anggotaKeluarga = [];
@@ -43,7 +77,8 @@ const Formulir = () => {
       return;
     }
 
-    // console.log("Data Pendaftaran:", data);
+    // Sanitasi semua input sebelum simpan ke database
+    data = sanitizeFormData(data);
 
     setIsSubmitting(true);
     simpanPendaftar(data)
@@ -53,7 +88,6 @@ const Formulir = () => {
         setShowSpouseData(false);
       })
       .catch((error) => {
-        console.error("Error saving data:", error);
         alert("Gagal menyimpan data: " + error.message);
       })
       .finally(() => {

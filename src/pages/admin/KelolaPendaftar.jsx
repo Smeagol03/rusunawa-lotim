@@ -127,7 +127,6 @@ const KelolaPendaftar = () => {
         setPendaftarToVerify(null);
         closeModal(); // Close detail modal if open
       } catch (error) {
-        console.error(error);
         alert("Gagal memverifikasi: " + error.message);
       }
     }
@@ -143,7 +142,6 @@ const KelolaPendaftar = () => {
         await pindahkanKeSampah(data);
         alert("Data berhasil dipindah ke sampah.");
       } catch (error) {
-        console.error(error);
         alert("Gagal menghapus: " + error.message);
       }
     }

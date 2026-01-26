@@ -92,7 +92,6 @@ export const logAktivitas = async (tipe, pesan, data = {}) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Gagal menyimpan log aktivitas:", error);
     // Tidak throw error agar tidak mengganggu operasi utama
   }
 };

@@ -104,7 +104,6 @@ const KelolaPenghuni = () => {
       alert("Data berhasil diperbarui!");
       closeModal();
     } catch (error) {
-      console.error("Gagal update:", error);
       alert("Gagal menyimpan perubahan: " + error.message);
     }
   };
@@ -119,7 +118,6 @@ const KelolaPenghuni = () => {
         await hapusPenghuni(data);
         alert("Penghuni berhasil dihapus (Soft Delete).");
       } catch (error) {
-        console.error(error);
         alert("Gagal menghapus: " + error.message);
       }
     }

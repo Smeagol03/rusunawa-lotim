@@ -46,7 +46,6 @@ const Laporan = () => {
       alert("Laporan berhasil dikirim! Terima kasih atas masukan Anda.");
       setFormData({ nama: "", nohp: "", laporan: "" }); // Reset form
     } catch (error) {
-      console.error("Error submitting report:", error);
       alert("Terjadi kesalahan saat mengirim laporan. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
