@@ -1,11 +1,21 @@
-import "/src/index.css";
 import React, { useState } from "react";
 import { simpanPendaftar } from "/src/config/database";
+import {
+  UserIcon,
+  MapPinIcon,
+  IdentificationIcon,
+  PhoneIcon,
+  UserGroupIcon,
+  BriefcaseIcon,
+  HeartIcon,
+  DocumentCheckIcon,
+  CheckCircleIcon,
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/outline";
 
-/**
- * Sanitasi input untuk mencegah XSS attacks
- * Escape karakter HTML special
- */
+// Sanitasi input for XSS
 const sanitizeInput = (str) => {
   if (typeof str !== "string") return str;
   return str
@@ -17,15 +27,12 @@ const sanitizeInput = (str) => {
     .trim();
 };
 
-/**
- * Sanitasi semua field dalam object
- */
 const sanitizeFormData = (data) => {
   const sanitized = {};
   for (const [key, value] of Object.entries(data)) {
     if (Array.isArray(value)) {
       sanitized[key] = value.map((item) =>
-        typeof item === "object" ? sanitizeFormData(item) : sanitizeInput(item)
+        typeof item === "object" ? sanitizeFormData(item) : sanitizeInput(item),
       );
     } else if (typeof value === "object" && value !== null) {
       sanitized[key] = sanitizeFormData(value);
@@ -37,135 +44,259 @@ const sanitizeFormData = (data) => {
 };
 
 const Formulir = () => {
-  const [showSpouseData, setShowSpouseData] = useState(false);
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    nama: "",
+    agama: "",
+    warga_negara: "indonesia",
+    alamat: "",
+    tempat_lahir: "",
+    tanggal_lahir: "",
+    nik: "",
+    no_hp: "",
+    status_tempat_tinggal: "",
+    status_perkawinan: "",
+    pekerjaan: "",
+    penghasilan: "",
+    nama_tempat_kerja: "",
+    alamat_pekerjaan: "",
+    anggotaKeluarga: [],
+    nik_pasangan: "",
+    pekerjaan_pasangan: "",
+    penghasilan_pasangan: "",
+    agreement: false,
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    let data = Object.fromEntries(formData);
-
-    // Collect family members data
-    const anggotaKeluarga = [];
-    for (let i = 1; i <= 4; i++) {
-      if (data[`anggota_${i}_nama`]) {
-        anggotaKeluarga.push({
-          nama: data[`anggota_${i}_nama`],
-          umur: data[`anggota_${i}_umur`],
-          hubungan: data[`anggota_${i}_hubungan`],
-          keterangan: data[`anggota_${i}_keterangan`],
-        });
-      }
+  const nextStep = () => {
+    const stepErrors = validateStep(step);
+    if (Object.keys(stepErrors).length === 0) {
+      setStep(step + 1);
+      setErrors({});
+    } else {
+      setErrors(stepErrors);
     }
-    data.anggotaKeluarga = anggotaKeluarga;
-
-    // Validation
-    if (!data.nama || !data.nik || !data.no_hp) {
-      alert("Mohon lengkapi semua field yang wajib diisi.");
-      return;
-    }
-    if (data.nik.length !== 16) {
-      alert("NIK harus 16 digit.");
-      return;
-    }
-    if (
-      showSpouseData &&
-      data.nik_pasangan &&
-      data.nik_pasangan.length !== 16
-    ) {
-      alert("NIK Pasangan harus 16 digit.");
-      return;
-    }
-
-    // Sanitasi semua input sebelum simpan ke database
-    data = sanitizeFormData(data);
-
-    setIsSubmitting(true);
-    simpanPendaftar(data)
-      .then(() => {
-        alert("Pendaftaran berhasil disubmit! ✅ Data Anda telah tersimpan.");
-        e.target.reset();
-        setShowSpouseData(false);
-      })
-      .catch((error) => {
-        alert("Gagal menyimpan data: " + error.message);
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
   };
 
-  // Reusable input styles
-  const inputClass =
-    "w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-200 outline-none bg-white text-slate-800 placeholder:text-slate-400";
-  const labelClass = "block text-slate-700 font-medium mb-2 text-sm";
-  const selectClass =
-    "w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-200 outline-none bg-white text-slate-800 cursor-pointer";
+  const prevStep = () => setStep(step - 1);
+
+  const validateStep = (currentStep) => {
+    let newErrors = {};
+    if (currentStep === 1) {
+      if (!formData.nama) newErrors.nama = "Nama lengkap wajib diisi";
+      if (!formData.nik || formData.nik.length !== 16)
+        newErrors.nik = "NIK harus 16 digit";
+      if (!formData.no_hp) newErrors.no_hp = "Nomor HP wajib diisi";
+      if (!formData.alamat) newErrors.alamat = "Alamat wajib diisi";
+    } else if (currentStep === 3) {
+      if (!formData.pekerjaan) newErrors.pekerjaan = "Pekerjaan wajib diisi";
+      if (!formData.penghasilan)
+        newErrors.penghasilan = "Penghasilan wajib diisi";
+    }
+    return newErrors;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.agreement) {
+      alert("Anda harus menyetujui pernyataan kebenaran data.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    const sanitizedData = sanitizeFormData(formData);
+
+    try {
+      await simpanPendaftar(sanitizedData);
+      setStep(5); // Success step
+    } catch (error) {
+      alert("Gagal menyimpan data: " + error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const inputClass = (name) => `
+    w-full px-4 py-3.5 rounded-2xl bg-slate-50 border transition-all duration-300
+    ${errors[name] ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"}
+    text-slate-900 font-medium placeholder:text-slate-400 outline-none
+  `;
+
+  const labelClass = "block text-sm font-bold text-slate-700 mb-2 ml-1";
 
   return (
-    <section className="py-12 md:py-16 bg-linear-to-br from-slate-50 via-emerald-50/30 to-teal-50/30 min-h-screen">
-      <div className="container mx-auto px-4">
-        <div className="max-w-5xl mx-auto">
-          {/* Form Card */}
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl shadow-emerald-500/10 border border-white overflow-hidden"
-          >
-            {/* Form Header */}
-            <div className="bg-linear-to-r from-emerald-600 via-emerald-500 to-teal-500 px-6 md:px-10 py-6 md:py-8">
-              <div className="flex items-center gap-4">
-                <span className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl text-2xl">
-                  📋
-                </span>
+    <section className="relative py-24 lg:py-32 bg-slate-50/50 min-h-screen overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full -z-10 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-emerald-100/40 via-transparent to-transparent"></div>
+
+      <div className="container mx-auto px-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Progress Header */}
+          {step < 5 && (
+            <div className="mb-12">
+              <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white">
-                    Formulir Pendaftaran
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                    Formulir{" "}
+                    <span className="text-emerald-600">Pendaftaran</span>
                   </h2>
-                  <p className="text-emerald-100 text-sm mt-1">
-                    Lengkapi data di bawah dengan benar
+                  <p className="text-slate-500 font-medium mt-1">
+                    Lengkapi data untuk mengajukan hunian Rusunawa
                   </p>
                 </div>
+                <div className="bg-white px-4 py-2 rounded-2xl shadow-sm border border-slate-100">
+                  <span className="text-sm font-black text-slate-900">
+                    Langkah {step} <span className="text-slate-400">/ 4</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="relative h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className="absolute left-0 top-0 h-full bg-linear-to-r from-emerald-500 to-teal-400 transition-all duration-700 ease-out"
+                  style={{ width: `${(step / 4) * 100}%` }}
+                ></div>
               </div>
             </div>
+          )}
 
-            <div className="p-6 md:p-10 space-y-10">
-              {/* ========== SECTION: DATA PRIBADI ========== */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <span className="text-lg">👤</span>
+          {/* Form Content */}
+          <div className="bg-white rounded-[40px] shadow-2xl shadow-emerald-900/5 border border-white p-8 md:p-12">
+            {step === 1 && (
+              <div className="space-y-8 animate-fadeIn">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+                    <UserIcon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-800">
-                    Data Pribadi
+                  <h3 className="text-xl font-black text-slate-900">
+                    Data Identitas Diri
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Nama */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="md:col-span-2">
-                    <label className={labelClass} htmlFor="nama">
-                      Nama Lengkap <span className="text-red-500">*</span>
+                    <label className={labelClass}>
+                      Nama Lengkap Sesuai KTP
                     </label>
                     <input
-                      className={inputClass}
-                      id="nama"
                       name="nama"
-                      type="text"
-                      placeholder="Masukkan nama sesuai KTP"
-                      required
+                      value={formData.nama}
+                      onChange={handleInputChange}
+                      className={inputClass("nama")}
+                      placeholder="Nama Lengkap"
                     />
+                    {errors.nama && (
+                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                        <ExclamationCircleIcon className="w-4 h-4" />
+                        {errors.nama}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Agama */}
                   <div>
-                    <label className={labelClass} htmlFor="agama">
-                      Agama <span className="text-red-500">*</span>
-                    </label>
+                    <label className={labelClass}>NIK (16 Digit)</label>
+                    <input
+                      name="nik"
+                      value={formData.nik}
+                      onChange={handleInputChange}
+                      maxLength="16"
+                      className={inputClass("nik")}
+                      placeholder="0000000000000000"
+                    />
+                    {errors.nik && (
+                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                        <ExclamationCircleIcon className="w-4 h-4" />
+                        {errors.nik}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className={labelClass}>Nomor HP / WhatsApp</label>
+                    <input
+                      name="no_hp"
+                      value={formData.no_hp}
+                      onChange={handleInputChange}
+                      className={inputClass("no_hp")}
+                      placeholder="081234567890"
+                    />
+                    {errors.no_hp && (
+                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                        <ExclamationCircleIcon className="w-4 h-4" />
+                        {errors.no_hp}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className={labelClass}>Alamat Lengkap</label>
+                    <textarea
+                      name="alamat"
+                      value={formData.alamat}
+                      onChange={handleInputChange}
+                      rows="3"
+                      className={inputClass("alamat")}
+                      placeholder="Isi alamat lengkap sesuai domisili"
+                    ></textarea>
+                    {errors.alamat && (
+                      <p className="text-red-500 text-xs mt-2 flex items-center gap-1">
+                        <ExclamationCircleIcon className="w-4 h-4" />
+                        {errors.alamat}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-8 animate-fadeIn">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="p-3 bg-teal-50 rounded-2xl text-teal-600">
+                    <UserGroupIcon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-black text-slate-900">
+                    Data Keluarga & Kelahiran
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className={labelClass}>Tempat Lahir</label>
+                    <input
+                      name="tempat_lahir"
+                      value={formData.tempat_lahir}
+                      onChange={handleInputChange}
+                      className={inputClass()}
+                      placeholder="Kota/Kabupaten"
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Tanggal Lahir</label>
+                    <input
+                      name="tanggal_lahir"
+                      value={formData.tanggal_lahir}
+                      onChange={handleInputChange}
+                      type="date"
+                      className={inputClass()}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Agama</label>
                     <select
-                      className={selectClass}
-                      id="agama"
                       name="agama"
-                      required
+                      value={formData.agama}
+                      onChange={handleInputChange}
+                      className={inputClass()}
                     >
                       <option value="">Pilih Agama</option>
                       <option value="islam">Islam</option>
@@ -173,582 +304,184 @@ const Formulir = () => {
                       <option value="katolik">Katolik</option>
                       <option value="hindu">Hindu</option>
                       <option value="buddha">Buddha</option>
-                      <option value="konghucu">Konghucu</option>
                     </select>
                   </div>
-
-                  {/* Warga Negara */}
                   <div>
-                    <label className={labelClass} htmlFor="warga_negara">
-                      Warga Negara <span className="text-red-500">*</span>
-                    </label>
+                    <label className={labelClass}>Status Tempat Tinggal</label>
                     <select
-                      className={selectClass}
-                      id="warga_negara"
-                      name="warga_negara"
-                      required
-                    >
-                      <option value="indonesia">Indonesia</option>
-                      <option value="wna">Warga Negara Asing</option>
-                    </select>
-                  </div>
-
-                  {/* Alamat */}
-                  <div className="md:col-span-2">
-                    <label className={labelClass} htmlFor="alamat">
-                      Alamat <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      className={`${inputClass} resize-none`}
-                      id="alamat"
-                      name="alamat"
-                      rows="3"
-                      placeholder="Alamat lengkap sesuai KTP"
-                      required
-                    ></textarea>
-                  </div>
-
-                  {/* Tempat Lahir */}
-                  <div>
-                    <label className={labelClass} htmlFor="tempat_lahir">
-                      Tempat Lahir <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="tempat_lahir"
-                      name="tempat_lahir"
-                      type="text"
-                      placeholder="Kota/Kabupaten"
-                      required
-                    />
-                  </div>
-
-                  {/* Tanggal Lahir */}
-                  <div>
-                    <label className={labelClass} htmlFor="tanggal_lahir">
-                      Tanggal Lahir <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="tanggal_lahir"
-                      name="tanggal_lahir"
-                      type="date"
-                      required
-                    />
-                  </div>
-
-                  {/* No. KTP */}
-                  <div>
-                    <label className={labelClass} htmlFor="nik">
-                      No. KTP <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="nik"
-                      name="nik"
-                      type="text"
-                      placeholder="Masukkan 16 digit nomor KTP"
-                      pattern="\d{16}"
-                      maxLength="16"
-                      title="NIK harus 16 digit angka"
-                      required
-                    />
-                    <p className="text-xs text-slate-500 mt-1.5">
-                      Masukkan 16 digit nomor KTP
-                    </p>
-                  </div>
-
-                  {/* Nomor HP */}
-                  <div>
-                    <label className={labelClass} htmlFor="no_hp">
-                      Nomor HP <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="no_hp"
-                      name="no_hp"
-                      type="tel"
-                      placeholder="Contoh: 081234567890"
-                      pattern="^08[0-9]{8,11}$"
-                      maxLength="13"
-                      required
-                    />
-                    <p className="text-xs text-slate-500 mt-1.5">
-                      Gunakan format nomor HP Indonesia yang valid
-                    </p>
-                  </div>
-
-                  {/* Status Tempat Tinggal */}
-                  <div className="md:col-span-2">
-                    <label
-                      className={labelClass}
-                      htmlFor="status_tempat_tinggal"
-                    >
-                      Status Tempat Tinggal Sekarang{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      className={selectClass}
-                      id="status_tempat_tinggal"
                       name="status_tempat_tinggal"
-                      required
+                      value={formData.status_tempat_tinggal}
+                      onChange={handleInputChange}
+                      className={inputClass()}
                     >
                       <option value="">Pilih Status</option>
-                      <option value="milik_sendiri">Milik Sendiri</option>
-                      <option value="sewa">Sewa/Kontrak</option>
-                      <option value="kos">Kos</option>
-                      <option value="numpang">Numpang dengan Keluarga</option>
-                      <option value="dinas">Rumah Dinas</option>
-                      <option value="lainnya">Lainnya</option>
+                      <option value="sewa">Sewa / Kontrak</option>
+                      <option value="numpang">Numpang Keluarga</option>
+                      <option value="milik">Milik Sendiri</option>
                     </select>
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Divider */}
-              <div className="border-t border-slate-200"></div>
-
-              {/* ========== SECTION: ANGGOTA KELUARGA ========== */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <span className="text-lg">👨‍👩‍👧‍👦</span>
+            {step === 3 && (
+              <div className="space-y-8 animate-fadeIn">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="p-3 bg-amber-50 rounded-2xl text-amber-600">
+                    <BriefcaseIcon className="w-6 h-6" />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-800">
-                      Anggota Keluarga
-                    </h3>
-                    <p className="text-sm text-slate-500">Maksimal 4 orang</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {[1, 2, 3, 4].map((num) => (
-                    <div
-                      key={num}
-                      className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/50 hover:border-emerald-300 transition-colors duration-300"
-                    >
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="w-7 h-7 bg-emerald-500 text-white text-sm font-bold rounded-full flex items-center justify-center">
-                          {num}
-                        </span>
-                        <h4 className="font-semibold text-slate-700">
-                          Anggota {num}
-                        </h4>
-                      </div>
-                      <div className="space-y-4">
-                        <div>
-                          <label
-                            className={labelClass}
-                            htmlFor={`anggota_${num}_nama`}
-                          >
-                            Nama
-                          </label>
-                          <input
-                            className={inputClass}
-                            id={`anggota_${num}_nama`}
-                            name={`anggota_${num}_nama`}
-                            type="text"
-                            placeholder="Nama anggota keluarga"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label
-                              className={labelClass}
-                              htmlFor={`anggota_${num}_umur`}
-                            >
-                              Umur
-                            </label>
-                            <input
-                              className={inputClass}
-                              id={`anggota_${num}_umur`}
-                              name={`anggota_${num}_umur`}
-                              type="number"
-                              min="0"
-                              max="150"
-                              placeholder="Tahun"
-                            />
-                          </div>
-                          <div>
-                            <label
-                              className={labelClass}
-                              htmlFor={`anggota_${num}_hubungan`}
-                            >
-                              Hubungan
-                            </label>
-                            <select
-                              className={selectClass}
-                              id={`anggota_${num}_hubungan`}
-                              name={`anggota_${num}_hubungan`}
-                            >
-                              <option value="">Pilih</option>
-                              <option value="suami">Suami</option>
-                              <option value="istri">Istri</option>
-                              <option value="anak">Anak</option>
-                              <option value="orang_tua">Orang Tua</option>
-                              <option value="mertua">Mertua</option>
-                              <option value="saudara">Saudara</option>
-                              <option value="lainnya">Lainnya</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div>
-                          <label
-                            className={labelClass}
-                            htmlFor={`anggota_${num}_keterangan`}
-                          >
-                            Keterangan
-                          </label>
-                          <input
-                            className={inputClass}
-                            id={`anggota_${num}_keterangan`}
-                            name={`anggota_${num}_keterangan`}
-                            type="text"
-                            placeholder="Keterangan tambahan"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-slate-200"></div>
-
-              {/* ========== SECTION: STATUS PERKAWINAN ========== */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
-                    <span className="text-lg">💍</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800">
-                    Status Perkawinan
+                  <h3 className="text-xl font-black text-slate-900">
+                    Informasi Pekerjaan
                   </h3>
                 </div>
 
-                <div className="max-w-md">
-                  <label className={labelClass} htmlFor="status_perkawinan">
-                    Status Perkawinan <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    className={selectClass}
-                    id="status_perkawinan"
-                    name="status_perkawinan"
-                    required
-                    onChange={(e) =>
-                      setShowSpouseData(e.target.value === "kawin")
-                    }
-                  >
-                    <option value="">Pilih Status</option>
-                    <option value="belum_kawin">Belum Kawin</option>
-                    <option value="kawin">Kawin</option>
-                    <option value="cerai_hidup">Cerai Hidup</option>
-                    <option value="cerai_mati">Cerai Mati</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-slate-200"></div>
-
-              {/* ========== SECTION: DATA PEKERJAAN ========== */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                    <span className="text-lg">💼</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-slate-800">
-                    Data Pekerjaan
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Pekerjaan */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className={labelClass} htmlFor="pekerjaan">
-                      Pekerjaan <span className="text-red-500">*</span>
-                    </label>
+                    <label className={labelClass}>Pekerjaan Utama</label>
                     <input
-                      className={inputClass}
-                      id="pekerjaan"
                       name="pekerjaan"
-                      type="text"
-                      placeholder="Ketik '-' jika tidak ada"
-                      required
+                      value={formData.pekerjaan}
+                      onChange={handleInputChange}
+                      className={inputClass("pekerjaan")}
+                      placeholder="Contoh: Karyawan Swasta"
                     />
-                    <p className="text-xs text-slate-500 mt-1.5">
-                      Ketik '-' jika tidak ada
-                    </p>
-                  </div>
-
-                  {/* Penghasilan */}
-                  <div>
-                    <label className={labelClass} htmlFor="penghasilan">
-                      Penghasilan Rata-rata/Bulan{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="penghasilan"
-                      name="penghasilan"
-                      type="text"
-                      placeholder="Ketik '0' jika tidak ada"
-                      required
-                    />
-                    <p className="text-xs text-slate-500 mt-1.5">
-                      Ketik '0' jika tidak ada
-                    </p>
-                  </div>
-
-                  {/* Nama Tempat Kerja */}
-                  <div>
-                    <label className={labelClass} htmlFor="nama_tempat_kerja">
-                      Nama Tempat Kerja
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="nama_tempat_kerja"
-                      name="nama_tempat_kerja"
-                      type="text"
-                      placeholder="Ketik '-' jika tidak ada"
-                    />
-                    <p className="text-xs text-slate-500 mt-1.5">
-                      Ketik '-' jika tidak ada
-                    </p>
-                  </div>
-
-                  {/* Alamat Pekerjaan */}
-                  <div>
-                    <label className={labelClass} htmlFor="alamat_pekerjaan">
-                      Alamat Pekerjaan
-                    </label>
-                    <input
-                      className={inputClass}
-                      id="alamat_pekerjaan"
-                      name="alamat_pekerjaan"
-                      type="text"
-                      placeholder="Ketik '-' jika tidak ada"
-                    />
-                    <p className="text-xs text-slate-500 mt-1.5">
-                      Ketik '-' jika tidak ada
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-slate-200"></div>
-
-              {/* ========== SECTION: DATA PASANGAN ========== */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                      <span className="text-lg">💑</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-800">
-                        Data Pasangan (Suami/Istri)
-                      </h3>
-                      <p className="text-sm text-slate-500">*opsional</p>
-                    </div>
-                  </div>
-                  <label className="flex items-center gap-3 cursor-pointer bg-slate-100 px-4 py-2 rounded-xl hover:bg-slate-200 transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={showSpouseData}
-                      onChange={(e) => setShowSpouseData(e.target.checked)}
-                      className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                    />
-                    <span className="text-sm font-medium text-slate-700">
-                      Isi Data Pasangan
-                    </span>
-                  </label>
-                </div>
-
-                {showSpouseData && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-6 bg-purple-50/50 rounded-2xl border border-purple-200/50 animate-fadeIn">
-                    {/* Pekerjaan Pasangan */}
-                    <div>
-                      <label
-                        className={labelClass}
-                        htmlFor="pekerjaan_pasangan"
-                      >
-                        Pekerjaan Istri/Suami
-                      </label>
-                      <input
-                        className={inputClass}
-                        id="pekerjaan_pasangan"
-                        name="pekerjaan_pasangan"
-                        type="text"
-                        placeholder="Pekerjaan pasangan"
-                      />
-                    </div>
-
-                    {/* Penghasilan Pasangan */}
-                    <div>
-                      <label
-                        className={labelClass}
-                        htmlFor="penghasilan_pasangan"
-                      >
-                        Penghasilan Istri/Suami
-                      </label>
-                      <input
-                        className={inputClass}
-                        id="penghasilan_pasangan"
-                        name="penghasilan_pasangan"
-                        type="text"
-                        placeholder="Penghasilan rata-rata/bulan"
-                      />
-                    </div>
-
-                    {/* Alamat Pekerjaan Pasangan */}
-                    <div>
-                      <label
-                        className={labelClass}
-                        htmlFor="alamat_pekerjaan_pasangan"
-                      >
-                        Alamat Pekerjaan Istri/Suami
-                      </label>
-                      <input
-                        className={inputClass}
-                        id="alamat_pekerjaan_pasangan"
-                        name="alamat_pekerjaan_pasangan"
-                        type="text"
-                        placeholder="Alamat tempat kerja pasangan"
-                      />
-                    </div>
-
-                    {/* NIK Pasangan */}
-                    <div>
-                      <label className={labelClass} htmlFor="nik_pasangan">
-                        No. KTP Istri/Suami
-                      </label>
-                      <input
-                        className={inputClass}
-                        id="nik_pasangan"
-                        name="nik_pasangan"
-                        type="text"
-                        placeholder="Masukkan 16 digit nomor KTP"
-                        pattern="\d{16}"
-                        maxLength="16"
-                        title="NIK harus 16 digit angka"
-                      />
-                      <p className="text-xs text-slate-500 mt-1.5">
-                        Masukkan 16 digit nomor KTP
+                    {errors.pekerjaan && (
+                      <p className="text-red-500 text-xs mt-2">
+                        {errors.pekerjaan}
                       </p>
-                    </div>
+                    )}
                   </div>
-                )}
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-slate-200"></div>
-
-              {/* Info Box */}
-              <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 md:p-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <span className="text-3xl">📎</span>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-amber-800 mb-3 text-base md:text-lg">
-                      Persyaratan Dokumen
-                    </h4>
-                    <ul className="text-sm md:text-base text-amber-700 space-y-2">
-                      {[
-                        "Fotokopi KTP pemohon dan pasangan (jika sudah menikah)",
-                        "Fotokopi Kartu Keluarga",
-                        "Surat Keterangan Penghasilan / Slip Gaji",
-                        "Surat Pernyataan belum memiliki rumah",
-                        "Pas foto 3x4 berwarna (2 lembar)",
-                      ].map((item, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-amber-500 mt-0.5">✓</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div>
+                    <label className={labelClass}>Penghasilan Per Bulan</label>
+                    <input
+                      name="penghasilan"
+                      value={formData.penghasilan}
+                      onChange={handleInputChange}
+                      className={inputClass("penghasilan")}
+                      placeholder="Contoh: 3,000,000"
+                    />
+                    {errors.penghasilan && (
+                      <p className="text-red-500 text-xs mt-2">
+                        {errors.penghasilan}
+                      </p>
+                    )}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className={labelClass}>
+                      Nama Instansi / Tempat Kerja
+                    </label>
+                    <input
+                      name="nama_tempat_kerja"
+                      value={formData.nama_tempat_kerja}
+                      onChange={handleInputChange}
+                      className={inputClass()}
+                      placeholder="Nama Perusahaan atau Instansi"
+                    />
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Agreement Checkbox */}
-              <div className="bg-slate-50 rounded-2xl p-5">
-                <label className="flex items-start gap-4 cursor-pointer group">
+            {step === 4 && (
+              <div className="space-y-8 animate-fadeIn text-center">
+                <div className="flex flex-col items-center gap-4 py-8">
+                  <div className="p-5 bg-indigo-50 rounded-full text-indigo-600 mb-4 scale-150">
+                    <DocumentCheckIcon className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900">
+                    Konfirmasi Akhir
+                  </h3>
+                  <p className="text-slate-500 font-medium max-w-sm">
+                    Mohon periksa kembali data Anda sebelum mengirimkan formulir
+                    ini.
+                  </p>
+                </div>
+
+                <div className="bg-slate-50 rounded-3xl p-8 text-left border border-slate-100 flex items-start gap-4">
                   <input
                     type="checkbox"
+                    id="agreement"
                     name="agreement"
-                    className="w-6 h-6 mt-0.5 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-                    required
+                    checked={formData.agreement}
+                    onChange={handleInputChange}
+                    className="w-6 h-6 rounded-lg text-emerald-600 focus:ring-emerald-500 border-slate-300 mt-1"
                   />
-                  <span className="text-slate-600 text-sm md:text-base leading-relaxed group-hover:text-slate-800 transition-colors">
-                    Saya menyatakan bahwa data yang saya isi adalah{" "}
-                    <strong>benar</strong> dan dapat dipertanggungjawabkan. Saya
-                    bersedia menerima sanksi sesuai peraturan yang berlaku
-                    apabila dikemudian hari ditemukan ketidaksesuaian data.
-                  </span>
-                </label>
-              </div>
-
-              {/* Submit Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <button
-                  id="submit-form"
-                  type="submit"
-                  className={`flex-1 sm:flex-none px-8 md:px-12 py-4 bg-linear-to-r from-emerald-600 to-teal-600 text-white text-base font-bold rounded-xl hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl hover:shadow-emerald-500/30 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 ${
-                    isSubmitting ? "opacity-75 cursor-not-allowed" : ""
-                  }`}
-                  disabled={isSubmitting}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  <label
+                    htmlFor="agreement"
+                    className="text-sm font-semibold text-slate-700 leading-relaxed cursor-pointer"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {isSubmitting ? "Mengirim..." : "Kirim Pendaftaran"}
-                </button>
+                    Saya menyatakan bahwa data yang saya isi adalah benar dan
+                    dapat dipertanggungjawabkan. Saya bersedia menerima sanksi
+                    apabila di kemudian hari ditemukan ketidaksesuaian data.
+                  </label>
+                </div>
+
                 <button
-                  type="reset"
-                  className="flex-1 sm:flex-none px-8 md:px-12 py-4 bg-slate-200 text-slate-700 text-base font-semibold rounded-xl hover:bg-slate-300 active:scale-[0.98] transition-all duration-300"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="w-full py-5 bg-slate-900 text-white font-black rounded-2xl shadow-2xl shadow-emerald-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
                 >
-                  Reset Form
+                  {isSubmitting ? (
+                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      Kirim Pendaftaran Berkas{" "}
+                      <CheckCircleIcon className="w-6 h-6" />
+                    </>
+                  )}
                 </button>
               </div>
-            </div>
-          </form>
+            )}
 
-          {/* Contact Info */}
-          <div className="mt-10 text-center">
-            <p className="text-slate-600 mb-4 font-medium">
-              Butuh bantuan? Hubungi kami:
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
-              <a
-                href="tel:+623761234567"
-                className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 text-emerald-700 hover:text-emerald-800 hover:shadow-md hover:border-emerald-300 transition-all duration-300"
-              >
-                <span>📞</span> (0376) 123-456
-              </a>
-              <a
-                href="mailto:perkim@lotim.go.id"
-                className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 text-emerald-700 hover:text-emerald-800 hover:shadow-md hover:border-emerald-300 transition-all duration-300"
-              >
-                <span>✉️</span> perkim@lotim.go.id
-              </a>
-              <span className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 text-slate-600">
-                <span>🏢</span> Jl. Prof. M. Yamin, Selong
-              </span>
-            </div>
+            {step === 5 && (
+              <div className="py-12 text-center animate-fadeIn">
+                <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <CheckCircleIcon className="w-16 h-16 text-emerald-600" />
+                </div>
+                <h3 className="text-3xl font-black text-slate-900 mb-4">
+                  Pendaftaran Terkirim!
+                </h3>
+                <p className="text-slate-600 text-lg font-medium max-w-md mx-auto mb-10 leading-relaxed">
+                  Terima kasih atas pendaftaran Anda. Tim admin kami akan
+                  melakukan verifikasi berkas dalam 3-5 hari kerja.
+                </p>
+                <button
+                  onClick={() => (window.location.href = "/")}
+                  className="px-10 py-4 bg-slate-100 text-slate-900 font-black rounded-2xl hover:bg-slate-200 transition-colors"
+                >
+                  Kembali ke Beranda
+                </button>
+              </div>
+            )}
+
+            {/* Step Navigation */}
+            {step < 4 && (
+              <div className="mt-12 flex items-center justify-between border-t border-slate-100 pt-10">
+                <button
+                  onClick={prevStep}
+                  disabled={step === 1}
+                  className={`flex items-center gap-2 px-6 py-3 font-bold rounded-2xl transition-all ${step === 1 ? "opacity-0 pointer-events-none" : "text-slate-500 hover:bg-slate-100"}`}
+                >
+                  <ArrowLeftIcon className="w-5 h-5" /> Sebelumnya
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="flex items-center gap-2 px-10 py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
+                >
+                  Lanjut <ArrowRightIcon className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
+
+          {/* Contact Support */}
+          {step < 5 && (
+            <div className="mt-12 text-center">
+              <p className="text-slate-500 text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-3">
+                <PhoneIcon className="w-4 h-4" /> Bantuan Teknis: (0376) 123-456
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </section>

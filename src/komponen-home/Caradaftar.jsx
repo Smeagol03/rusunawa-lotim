@@ -1,188 +1,222 @@
+import {
+  DocumentTextIcon,
+  PencilSquareIcon,
+  PaperAirplaneIcon,
+  ClockIcon,
+  CheckBadgeIcon,
+  ArrowRightIcon,
+  DocumentCheckIcon,
+} from "@heroicons/react/24/outline";
+
 const Caradaftar = () => {
   const steps = [
     {
       step: 1,
-      icon: "📋",
+      icon: DocumentTextIcon,
       title: "Siapkan Dokumen",
       description:
-        "Siapkan dokumen persyaratan seperti KTP, KK, Surat Penghasilan, dan dokumen pendukung lainnya",
+        "Siapkan dokumen persyaratan utama untuk memperlancar proses pendaftaran Anda.",
       details: [
-        "Fotokopi KTP",
-        "Fotokopi Kartu Keluarga",
-        "Surat Keterangan Penghasilan",
+        "Scan KTP & KK",
+        "Slip Gaji/Keterangan Penghasilan",
+        "Surat Pernyataan Belum Punya Rumah",
       ],
+      color: "emerald",
     },
     {
       step: 2,
-      icon: "📝",
+      icon: PencilSquareIcon,
       title: "Isi Formulir Online",
       description:
-        "Kunjungi halaman pendaftaran dan isi formulir dengan data yang lengkap dan benar",
-      details: ["Data pribadi", "Informasi kontak", "Data pekerjaan"],
+        "Lengkapi data diri dan informasi keluarga pada form pendaftaran digital kami.",
+      details: [
+        "Data Pribadi Lengkap",
+        "Riwayat Pekerjaan",
+        "Anggota Keluarga",
+      ],
+      color: "teal",
     },
     {
       step: 3,
-      icon: "📤",
+      icon: PaperAirplaneIcon,
       title: "Kirim Pendaftaran",
       description:
-        "Periksa kembali data Anda, centang persetujuan, lalu kirim formulir pendaftaran",
+        "Pastikan semua data benar, lalu kirimkan berkas Anda secara sistematis.",
       details: [
-        "Verifikasi data",
-        "Setujui syarat & ketentuan",
-        "Submit formulir",
+        "Review Ulang Data",
+        "Persetujuan S&K",
+        "Konfirmasi Pengiriman",
       ],
+      color: "cyan",
     },
     {
       step: 4,
-      icon: "⏳",
-      title: "Tunggu Verifikasi",
+      icon: ClockIcon,
+      title: "Proses Verifikasi",
       description:
-        "Tim kami akan memverifikasi data dan dokumen Anda dalam waktu 3-5 hari kerja",
-      details: [
-        "Pengecekan dokumen",
-        "Validasi data",
-        "Konfirmasi via telepon",
-      ],
+        "Tim admin kami akan melakukan audit internal dan pengecekan kelayakan berkas.",
+      details: ["Audit Dokumen", "Validasi Ekonomi", "Survey Lapangan"],
+      color: "sky",
     },
     {
       step: 5,
-      icon: "✅",
-      title: "Konfirmasi & Survei",
+      icon: CheckBadgeIcon,
+      title: "Penetapan & Kontrak",
       description:
-        "Setelah lolos verifikasi, Anda akan dihubungi untuk survei lokasi unit hunian",
-      details: [
-        "Penjadwalan survei",
-        "Pemilihan unit",
-        "Penandatanganan kontrak",
-      ],
+        "Penandatanganan akad sewa dan serah terima kunci unit hunian baru Anda.",
+      details: ["Pemilihan Unit", "Akad Sewa", "Serah Terima Kunci"],
+      color: "indigo",
     },
   ];
 
   return (
-    <section id="caradaftar" className="py-16 sm:py-20 lg:py-24 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section
+      id="caradaftar"
+      className="relative py-24 lg:py-32 bg-slate-50/50 overflow-hidden"
+    >
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full -z-10 overflow-hidden opacity-40">
+        <div className="absolute top-[-10%] right-[-5%] w-160 h-160 bg-teal-100/50 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-160 h-160 bg-emerald-100/50 rounded-full blur-[120px]"></div>
+      </div>
+
+      <div className="container mx-auto px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="inline-block bg-teal-100 text-teal-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
-            Panduan Pendaftaran
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 mb-4 sm:mb-6">
-            Cara <span className="text-teal-600">Mendaftar</span>
+        <div className="text-center max-w-4xl mx-auto mb-20 animate-fadeIn">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-200/50 backdrop-blur-sm border border-slate-300/50 mb-6">
+            <DocumentCheckIcon className="w-5 h-5 text-slate-700" />
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-[0.2em]">
+              Step-by-Step Guide
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 tracking-tight">
+            Alur <span className="text-emerald-600">Pendaftaran</span>
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Ikuti langkah-langkah mudah berikut untuk mendaftar sebagai calon
-            penghuni Rusunawa
+          <p className="text-slate-600 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
+            Dapatkan hunian impian Anda dengan mengikuti prosedur pendaftaran
+            resmi yang transparan dan terintegrasi secara digital.
           </p>
         </div>
 
-        {/* Steps Timeline */}
-        <div className="max-w-5xl mx-auto">
-          {/* Desktop Timeline */}
-          <div className="hidden lg:block">
-            <div className="relative">
-              {/* Timeline Line */}
-              <div className="absolute top-[105px] left-0 right-0 h-1 bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full"></div>
+        {/* Steps Journey */}
+        <div className="relative max-w-6xl mx-auto">
+          {/* Vertical Center Line for Desktop */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-linear-to-b from-emerald-100 via-teal-500 to-indigo-100 -translate-x-1/2 hidden lg:block rounded-full opacity-30"></div>
 
-              {/* Steps */}
-              <div className="grid grid-cols-5 gap-4">
-                {steps.map((item, index) => (
-                  <div key={index} className="relative">
-                    {/* Step Circle */}
-                    <div className="flex flex-col items-center">
-                      <div className="w-20 h-20 bg-linear-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-4xl shadow-lg shadow-emerald-200 mb-4 relative z-10">
-                        {item.icon}
-                      </div>
-                      <div className="w-10 h-10 bg-white border-4 border-teal-500 rounded-full flex items-center justify-center font-bold text-teal-600 text-lg -mt-2 relative z-20">
-                        {item.step}
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="text-center mt-6">
-                      <h3 className="font-bold text-slate-800 text-lg mb-2">
-                        {item.title}
-                      </h3>
-                      <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                        {item.description}
-                      </p>
-                      <ul className="text-xs text-slate-500 space-y-1">
-                        {item.details.map((detail, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-center justify-center gap-1"
-                          >
-                            <span className="text-teal-500">✓</span>
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile & Tablet Timeline */}
-          <div className="lg:hidden space-y-6">
+          <div className="space-y-12 lg:space-y-0">
             {steps.map((item, index) => (
-              <div key={index} className="relative flex gap-4 sm:gap-6">
-                {/* Left Side - Step Number & Line */}
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-linear-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-2xl sm:text-3xl shadow-lg">
-                    {item.icon}
+              <div
+                key={index}
+                className={`relative flex flex-col ${index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"} items-center lg:min-h-[250px]`}
+              >
+                {/* Visual Connector - Circle with Step Number */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-0 lg:top-1/2 lg:-translate-y-1/2 z-20 hidden lg:flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl bg-white shadow-xl border-4 border-slate-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <span className="text-xl font-black text-slate-900">
+                      {item.step}
+                    </span>
                   </div>
-                  {index < steps.length - 1 && (
-                    <div className="w-0.5 flex-1 bg-linear-to-b from-teal-500 to-teal-200 mt-3"></div>
-                  )}
                 </div>
 
-                {/* Right Side - Content */}
-                <div className="flex-1 pb-8">
-                  <div className="bg-slate-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-slate-100">
-                    {/* Step Badge */}
-                    <div className="inline-flex items-center gap-2 bg-teal-100 text-teal-700 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full mb-3">
-                      <span>Langkah {item.step}</span>
+                {/* Content Card */}
+                <div
+                  className={`w-full lg:w-[45%] ${index % 2 === 0 ? "lg:pr-16" : "lg:pl-16"}`}
+                >
+                  <div className="group relative bg-white rounded-[32px] p-8 shadow-sm hover:shadow-2xl hover:shadow-emerald-100/50 border border-slate-100 transition-all duration-500 hover:-translate-y-2">
+                    {/* Header: Icon + Title */}
+                    <div className="flex items-center gap-4 mb-6">
+                      <div
+                        className={`p-4 rounded-2xl bg-${item.color}-50 text-${item.color}-600 group-hover:scale-110 transition-transform duration-300`}
+                      >
+                        <item.icon className="w-8 h-8" />
+                      </div>
+                      <div className="lg:hidden w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-sm font-black text-slate-500">
+                        {item.step}
+                      </div>
+                      <h3 className="text-2xl font-black text-slate-900 group-hover:text-emerald-700 transition-colors">
+                        {item.title}
+                      </h3>
                     </div>
 
-                    <h3 className="font-bold text-slate-800 text-lg sm:text-xl mb-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
+                    <p className="text-slate-500 font-medium leading-relaxed mb-6">
                       {item.description}
                     </p>
 
-                    {/* Details */}
-                    <div className="flex flex-wrap gap-2">
+                    {/* Features List */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {item.details.map((detail, idx) => (
-                        <span
+                        <div
                           key={idx}
-                          className="inline-flex items-center gap-1 bg-white text-slate-600 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-slate-200"
+                          className="flex items-center gap-2 group/item text-sm font-bold text-slate-600"
                         >
-                          <span className="text-teal-500">✓</span>
-                          {detail}
-                        </span>
+                          <div
+                            className={`w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600`}
+                          >
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="3"
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          </div>
+                          <span>{detail}</span>
+                        </div>
                       ))}
                     </div>
+
+                    {/* Decorative Corner Blur */}
+                    <div
+                      className={`absolute -bottom-2 -right-2 w-24 h-24 bg-${item.color}-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700`}
+                    ></div>
                   </div>
                 </div>
+
+                {/* Empty Space for Zig-Zag */}
+                <div className="hidden lg:block lg:w-[45%]"></div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="mt-12 sm:mt-16 text-center">
-          <p className="text-slate-600 mb-6 text-sm sm:text-base">
-            Sudah siap mendaftar? Klik tombol di bawah untuk memulai pendaftaran
-          </p>
-          <a
-            href="/daftar"
-            className="inline-flex items-center justify-center gap-2 bg-linear-to-r from-emerald-600 to-teal-600 text-white font-semibold px-8 sm:px-10 py-3 sm:py-4 rounded-xl hover:from-emerald-700 hover:to-teal-700 hover:shadow-lg active:scale-95 transition-all duration-300 text-sm sm:text-base"
-          >
-            <span className="text-xl">📝</span>
-            Mulai Pendaftaran
-          </a>
+        {/* Global CTA Section */}
+        <div className="mt-24 lg:mt-32 text-center animate-fadeIn group">
+          <div className="relative inline-block px-10 py-16 rounded-[48px] bg-slate-900 overflow-hidden w-full max-w-4xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)]">
+            {/* Animated BG Gradients */}
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-1000"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-1000"></div>
+
+            <div className="relative z-10 space-y-8">
+              <h3 className="text-3xl md:text-4xl font-black text-white px-4 leading-tight">
+                Sudah Menyiapkan <br />
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-300">
+                  Seluruh Kelengkapan?
+                </span>
+              </h3>
+              <p className="text-slate-400 font-medium max-w-xl mx-auto">
+                Klik tombol di bawah untuk masuk ke ruang formulir digital dan
+                ajukan hunian impian Anda sekarang juga.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a
+                  href="/daftar"
+                  className="relative inline-flex items-center justify-center px-12 py-5 font-black text-white bg-linear-to-r from-emerald-600 to-teal-500 rounded-3xl shadow-xl shadow-emerald-500/20 group/btn transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/40 active:scale-95 overflow-hidden"
+                >
+                  <span className="relative flex items-center gap-3">
+                    Buka Formulir Digital
+                    <ArrowRightIcon className="w-6 h-6 group-hover/btn:translate-x-1 transition-transform" />
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
