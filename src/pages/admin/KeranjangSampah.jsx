@@ -11,21 +11,21 @@ import {
   TrashIcon,
   ArrowPathIcon,
   ExclamationTriangleIcon,
+  MagnifyingGlassIcon,
+  TrashIcon as TrashIconSolid,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import SearchInput from "/src/components/admin/SearchInput";
 import KonfirmasiModal from "/src/components/admin/KonfirmasiModal";
 
 const KeranjangSampah = () => {
-  const [activeTab, setActiveTab] = useState("pendaftar"); // 'pendaftar' | 'penghuni'
+  const [activeTab, setActiveTab] = useState("pendaftar");
   const [dataPendaftar, setDataPendaftar] = useState([]);
   const [dataPenghuni, setDataPenghuni] = useState([]);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
 
-  // Search State
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Modal State for layered confirmation
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
@@ -37,14 +37,12 @@ const KeranjangSampah = () => {
       setDataPenghuni(data);
       setLoading(false);
     });
-
     return () => {
       unsubPendaftar();
       unsubPenghuni();
     };
   }, []);
 
-  // Clear selection and search when tab changes
   useEffect(() => {
     setSelectedIds(new Set());
     setSearchQuery("");
@@ -52,19 +50,16 @@ const KeranjangSampah = () => {
 
   const currentData = activeTab === "pendaftar" ? dataPendaftar : dataPenghuni;
 
-  // Filtered data based on search query
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return currentData;
-
     const query = searchQuery.toLowerCase();
     return currentData.filter(
       (item) =>
         item.nama?.toLowerCase().includes(query) ||
-        item.nik?.toLowerCase().includes(query)
+        item.nik?.toLowerCase().includes(query),
     );
   }, [currentData, searchQuery]);
 
-  // Toggle Selection
   const toggleSelect = (id) => {
     const newSelected = new Set(selectedIds);
     if (newSelected.has(id)) {
@@ -76,46 +71,37 @@ const KeranjangSampah = () => {
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === currentData.length) {
+    if (selectedIds.size === filteredData.length) {
       setSelectedIds(new Set());
     } else {
-      const allIds = new Set(currentData.map((item) => item.nik));
+      const allIds = new Set(filteredData.map((item) => item.nik));
       setSelectedIds(allIds);
     }
   };
 
-  // Actions
   const handleRestore = async () => {
     if (selectedIds.size === 0) return;
-    if (
-      !window.confirm(
-        `Pulihkan ${selectedIds.size} item terpilih? Data akan kembali ke daftar Pendaftar.`
-      )
-    )
-      return;
-
-    try {
-      const promises = Array.from(selectedIds).map((id) => {
-        const item = currentData.find((d) => d.nik === id);
-        return activeTab === "pendaftar"
-          ? pulihkanPendaftar(item)
-          : pulihkanPenghuni(item);
-      });
-      await Promise.all(promises);
-      alert("Berhasil memulihkan data!");
-      setSelectedIds(new Set());
-    } catch (e) {
-      alert("Gagal memulihkan: " + e.message);
+    if (confirm(`Restore ${selectedIds.size} items?`)) {
+      try {
+        const promises = Array.from(selectedIds).map((id) => {
+          const item = currentData.find((d) => d.nik === id);
+          return activeTab === "pendaftar"
+            ? pulihkanPendaftar(item)
+            : pulihkanPenghuni(item);
+        });
+        await Promise.all(promises);
+        setSelectedIds(new Set());
+      } catch (e) {
+        alert("Gagal memulihkan: " + e.message);
+      }
     }
   };
 
-  // Open modal for delete confirmation
   const handleDeletePermanentClick = () => {
     if (selectedIds.size === 0) return;
     setIsDeleteModalOpen(true);
   };
 
-  // Actual delete execution (called from modal)
   const executeDeletePermanent = async () => {
     try {
       const promises = Array.from(selectedIds).map((id) => {
@@ -124,93 +110,88 @@ const KeranjangSampah = () => {
           : hapusPermanenPenghuni(id);
       });
       await Promise.all(promises);
-      alert("Data berhasil dihapus selamanya.");
       setSelectedIds(new Set());
+      setIsDeleteModalOpen(false);
     } catch (e) {
       alert("Gagal menghapus: " + e.message);
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Keranjang Sampah
+    <div className="space-y-10 pb-20">
+      {/* Header & Tabs */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="space-y-4">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            Audit Archive
           </h1>
-          <p className="text-sm text-slate-500">
-            Kelola data yang telah dihapus sementara
-          </p>
+          <div className="inline-flex p-1.5 bg-slate-100 rounded-[20px]">
+            <button
+              onClick={() => setActiveTab("pendaftar")}
+              className={`px-6 py-2.5 rounded-[16px] text-[10px] font-black uppercase tracking-widest transition-all ${
+                activeTab === "pendaftar"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Applicants ({dataPendaftar.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("penghuni")}
+              className={`px-6 py-2.5 rounded-[16px] text-[10px] font-black uppercase tracking-widest transition-all ${
+                activeTab === "penghuni"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Residents ({dataPenghuni.length})
+            </button>
+          </div>
         </div>
 
-        {/* Action Bar */}
         {selectedIds.size > 0 && (
-          <div className="flex gap-2 animate-fadeIn bg-white p-2 rounded-lg shadow-sm border border-slate-200">
+          <div className="flex items-center gap-3 animate-slideUp">
             <button
               onClick={handleRestore}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 font-medium transition"
+              className="px-6 py-3 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-emerald-200 flex items-center gap-2"
             >
               <ArrowPathIcon className="w-4 h-4" />
-              Pulihkan ({selectedIds.size})
+              Restore Selection
             </button>
             <button
               onClick={handleDeletePermanentClick}
-              className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium transition"
+              className="px-6 py-3 bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-all active:scale-95 flex items-center gap-2"
             >
               <TrashIcon className="w-4 h-4" />
-              Hapus Permanen ({selectedIds.size})
+              Wipe Permanently
             </button>
           </div>
         )}
       </div>
 
-      {/* Search Input */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="w-full md:w-72">
-          <SearchInput
+      {/* Control Bar */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1 relative group">
+          <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+            <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 group-focus-within:text-rose-500 transition-colors" />
+          </div>
+          <input
+            type="text"
             value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Cari nama atau NIK..."
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Filter archive by identity or name..."
+            className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-[24px] text-sm font-medium focus:outline-hidden focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all shadow-sm"
           />
         </div>
-        {searchQuery && (
-          <span className="bg-amber-100 text-amber-800 text-sm font-medium px-3 py-1 rounded-full">
-            Ditemukan: {filteredData.length}
-          </span>
-        )}
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab("pendaftar")}
-          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${
-            activeTab === "pendaftar"
-              ? "border-emerald-500 text-emerald-600"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Pendaftar Dihapus ({dataPendaftar.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("penghuni")}
-          className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${
-            activeTab === "penghuni"
-              ? "border-emerald-500 text-emerald-600"
-              : "border-transparent text-gray-500 hover:text-gray-700"
-          }`}
-        >
-          Penghuni Dihapus ({dataPenghuni.length})
-        </button>
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Data Section */}
+      <div className="bg-white rounded-[40px] border border-slate-100 shadow-2xl shadow-slate-900/5 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-gray-800 font-semibold uppercase tracking-wider text-xs">
-              <tr>
-                <th className="px-6 py-4 w-10">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50/50 border-b border-slate-100">
+                <th className="px-8 py-6 w-10">
                   <input
                     type="checkbox"
                     checked={
@@ -218,85 +199,97 @@ const KeranjangSampah = () => {
                       selectedIds.size === filteredData.length
                     }
                     onChange={toggleSelectAll}
-                    disabled={filteredData.length === 0}
-                    className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    className="w-5 h-5 rounded-[6px] border-slate-200 text-rose-600 focus:ring-rose-500 focus:ring-offset-0"
                   />
                 </th>
-                <th className="px-6 py-4">Nama Lengkap</th>
-                <th className="px-6 py-4">NIK</th>
-                <th className="px-6 py-4">Tanggal Dihapus</th>
-                <th className="px-6 py-4">Keterangan</th>
+                <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Subject
+                </th>
+                <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Identity (NIK)
+                </th>
+                <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Deletion Date
+                </th>
+                <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Origin
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td
-                    colSpan="5"
-                    className="px-6 py-8 text-center text-gray-500"
-                  >
-                    Memuat data...
+                  <td colSpan="5" className="px-8 py-20 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                        Reviewing Archive...
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : filteredData.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center">
-                    <TrashIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">
-                      {searchQuery
-                        ? "Tidak ada hasil yang cocok."
-                        : "Keranjang sampah kosong."}
-                    </p>
+                  <td colSpan="5" className="px-8 py-32 text-center">
+                    <div className="flex flex-col items-center gap-4 opacity-30">
+                      <TrashIconSolid className="w-20 h-20 text-slate-300" />
+                      <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Empty Archive
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 filteredData.map((item) => (
                   <tr
                     key={item.nik}
-                    className={`hover:bg-gray-50 transition-colors cursor-pointer ${
-                      selectedIds.has(item.nik) ? "bg-emerald-50/50" : ""
-                    }`}
-                    onClick={(e) => {
-                      // Prevent toggle if clicking proper checkbox handled by itself
-                      if (e.target.type !== "checkbox") toggleSelect(item.nik);
-                    }}
+                    className={`group hover:bg-slate-50/50 transition-colors cursor-pointer ${selectedIds.has(item.nik) ? "bg-rose-50/30" : ""}`}
+                    onClick={() => toggleSelect(item.nik)}
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-8 py-6">
                       <input
                         type="checkbox"
                         checked={selectedIds.has(item.nik)}
-                        onChange={() => toggleSelect(item.nik)}
-                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                        onChange={() => {}}
+                        className="w-5 h-5 rounded-[6px] border-slate-200 text-rose-600 focus:ring-rose-500 focus:ring-offset-0"
                       />
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-900">
-                      {item.nama}
-                    </td>
-                    <td className="px-6 py-4">{item.nik}</td>
-                    <td className="px-6 py-4 text-gray-500">
-                      {item.tanggal_dihapus
-                        ? new Date(item.tanggal_dihapus).toLocaleDateString(
-                            "id-ID",
-                            {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )
-                        : "-"}
-                    </td>
-                    <td className="px-6 py-4 text-xs">
-                      {activeTab === "penghuni" ? (
-                        <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded">
-                          Eks Penghuni
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-black text-slate-400 transition-colors group-hover:bg-rose-100 group-hover:text-rose-600">
+                          {item.nama?.charAt(0)}
+                        </div>
+                        <span className="text-sm font-black text-slate-900">
+                          {item.nama}
                         </span>
-                      ) : (
-                        <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
-                          Eks Pendaftar
-                        </span>
-                      )}
+                      </div>
+                    </td>
+                    <td className="px-8 py-6">
+                      <code className="text-xs font-bold text-slate-500">
+                        {item.nik}
+                      </code>
+                    </td>
+                    <td className="px-8 py-6">
+                      <p className="text-xs font-bold text-slate-400">
+                        {item.tanggal_dihapus
+                          ? new Date(item.tanggal_dihapus).toLocaleString(
+                              "id-ID",
+                            )
+                          : "N/A"}
+                      </p>
+                    </td>
+                    <td className="px-8 py-6">
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-inset ${
+                          activeTab === "penghuni"
+                            ? "bg-rose-50 text-rose-700 ring-rose-200"
+                            : "bg-amber-50 text-amber-700 ring-amber-200"
+                        }`}
+                      >
+                        {activeTab === "penghuni"
+                          ? "Former Resident"
+                          : "Former Applicant"}
+                      </span>
                     </td>
                   </tr>
                 ))
@@ -306,24 +299,31 @@ const KeranjangSampah = () => {
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3 text-sm text-blue-800">
-        <ExclamationTriangleIcon className="w-5 h-5 shrink-0" />
-        <p>
-          <strong>Catatan:</strong> Data Penghuni yang dipulihkan akan masuk
-          kembali ke daftar
-          <strong> Pendaftar (Menunggu Verifikasi)</strong>. Anda perlu
-          memverifikasi ulang dan memilihkan unit baru untuk mereka.
-        </p>
+      {/* Advisory Info */}
+      <div className="bg-slate-900 rounded-[32px] p-8 border border-slate-800 flex items-start gap-6 shadow-2xl">
+        <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center shrink-0">
+          <ShieldCheckIcon className="w-7 h-7 text-emerald-500" />
+        </div>
+        <div className="space-y-2">
+          <h4 className="text-sm font-black text-white uppercase tracking-widest">
+            Procedural Notice
+          </h4>
+          <p className="text-slate-400 text-sm font-light leading-relaxed">
+            Restoring data will move residents back to{" "}
+            <span className="text-amber-400 font-bold">Pending Audit</span>{" "}
+            status. They will require re-verification and a new unit assignment
+            to become active again in the system.
+          </p>
+        </div>
       </div>
 
-      {/* Layered Confirmation Modal */}
       <KonfirmasiModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={executeDeletePermanent}
-        title="Hapus Data Permanen"
-        message="Data yang dihapus permanen tidak dapat dikembalikan lagi!"
-        confirmWord="KONFIRMASI"
+        title="Wipe Archive Permanently"
+        message="This action is irreversible. The selected records will be purged from the database forever."
+        confirmWord="PURGE DATA"
         itemCount={selectedIds.size}
       />
     </div>

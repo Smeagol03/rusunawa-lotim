@@ -4,45 +4,44 @@ import {
   updateUnitPenghuni,
   hapusPenghuni,
 } from "/src/config/database";
-import { UserIcon, HomeIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import {
+  UserIcon,
+  HomeIcon,
+  FunnelIcon,
+  Squares2X2Icon,
+  ArrowRightStartOnRectangleIcon,
+  ArchiveBoxIcon,
+  MagnifyingGlassIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import SearchInput from "/src/components/admin/SearchInput";
 import PilihUnitModal from "/src/components/admin/PilihUnitModal";
-
-import { generateUnits } from "/src/config/unitConfig"; // Import Config
+import { generateUnits } from "/src/config/unitConfig";
 
 const KelolaUnit = () => {
   const [penghuni, setPenghuni] = useState([]);
   const [units, setUnits] = useState([]);
 
-  // Search and Filter State
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all"); // 'all' | 'occupied' | 'empty'
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  // Modal State for Move Unit
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOccupant, setSelectedOccupant] = useState(null);
 
   useEffect(() => {
-    // Use shared filtered logic
     setUnits(generateUnits());
-
     const unsubscribe = listenToPenghuni((data) => {
       setPenghuni(data);
     });
-
     return () => unsubscribe();
   }, []);
 
-  // Helper to find occupant
   const getOccupant = (unitId) => {
     return penghuni.find((p) => p.nomor_unit === unitId);
   };
 
-  // Filtered units based on search and filter
   const filteredUnits = useMemo(() => {
     let result = units;
-
-    // Filter by status
     if (filterStatus !== "all") {
       result = result.filter((unit) => {
         const occupant = getOccupant(unit.id);
@@ -51,8 +50,6 @@ const KelolaUnit = () => {
         return true;
       });
     }
-
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter((unit) => {
@@ -64,59 +61,36 @@ const KelolaUnit = () => {
         );
       });
     }
-
     return result;
   }, [units, penghuni, searchQuery, filterStatus]);
 
-  // Open modal for moving unit
   const handlePindahClick = (occupant) => {
     setSelectedOccupant(occupant);
     setIsModalOpen(true);
   };
 
-  // Handle unit selection from modal
   const handleUnitSelected = async (newUnit) => {
     if (!selectedOccupant) return;
-
     const oldUnit = selectedOccupant.nomor_unit;
+    if (newUnit === oldUnit) return;
 
-    if (newUnit === oldUnit) {
-      alert("Unit yang dipilih sama dengan unit saat ini.");
-      return;
-    }
-
-    if (
-      window.confirm(
-        `Pindahkan ${selectedOccupant.nama} dari Unit ${oldUnit} ke Unit ${newUnit}?`
-      )
-    ) {
-      try {
-        await updateUnitPenghuni(
-          selectedOccupant.nik,
-          newUnit,
-          selectedOccupant.nama
-        );
-        alert(
-          `Berhasil! ${selectedOccupant.nama} dipindahkan ke Unit ${newUnit}.`
-        );
-        setIsModalOpen(false);
-        setSelectedOccupant(null);
-      } catch (e) {
-        alert("Gagal: " + e.message);
-      }
+    try {
+      await updateUnitPenghuni(
+        selectedOccupant.nik,
+        newUnit,
+        selectedOccupant.nama,
+      );
+      setIsModalOpen(false);
+      setSelectedOccupant(null);
+    } catch (e) {
+      alert("Gagal: " + e.message);
     }
   };
 
   const handleHapus = async (occupant) => {
-    if (
-      window.confirm(
-        `Yakin ingin menghapus ${occupant.nama}? Data akan dipindah ke Keranjang Sampah (bisa dipulihkan).`
-      )
-    ) {
+    if (confirm(`Pindahkan ${occupant.nama} ke Sampah?`)) {
       try {
-        // Pass the full object so it can be saved to trash
         await hapusPenghuni(occupant);
-        alert("Penghuni berhasil dipindahkan ke sampah.");
       } catch (e) {
         alert("Gagal: " + e.message);
       }
@@ -124,64 +98,69 @@ const KelolaUnit = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Kelola Unit Rusun
+    <div className="space-y-10 pb-20">
+      {/* Header & Stats */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            Manajemen Aset Unit
           </h1>
-          <div className="flex gap-2 mt-1 flex-wrap">
-            <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-              Total: {units.length}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-2 px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-slate-200">
+              <Squares2X2Icon className="w-3.5 h-3.5" />
+              {units.length} Unit Total
             </span>
-            <span className="bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded-full">
-              Terisi: {penghuni.length}
+            <span className="flex items-center gap-2 px-4 py-1.5 bg-rose-50 text-rose-700 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-rose-100">
+              <UserIcon className="w-3.5 h-3.5" />
+              {penghuni.length} Terisi
             </span>
-            <span className="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-              Kosong: {units.length - penghuni.length}
+            <span className="flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-emerald-100">
+              <HomeIcon className="w-3.5 h-3.5" />
+              {units.length - penghuni.length} Tersedia
             </span>
-            {(searchQuery || filterStatus !== "all") && (
-              <span className="bg-amber-100 text-amber-800 text-sm font-medium px-3 py-1 rounded-full">
-                Ditemukan: {filteredUnits.length}
-              </span>
-            )}
           </div>
         </div>
-        {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <div className="w-full sm:w-64">
-            <SearchInput
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative group min-w-[300px]">
+            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+              <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
+            </div>
+            <input
+              type="text"
               value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder="Cari unit atau nama penghuni..."
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by unit ID or resident name..."
+              className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-[24px] text-sm font-medium focus:outline-hidden focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all shadow-sm"
             />
           </div>
           <div className="relative">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="appearance-none w-full sm:w-40 px-4 py-2.5 pr-8 text-sm text-gray-900 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all cursor-pointer"
+              className="appearance-none w-full sm:w-44 px-6 py-4 pr-12 text-sm font-black text-slate-700 bg-white border border-slate-100 rounded-[24px] focus:outline-hidden focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all cursor-pointer shadow-sm uppercase tracking-widest"
             >
-              <option value="all">Semua Unit</option>
-              <option value="occupied">Terisi</option>
-              <option value="empty">Kosong</option>
+              <option value="all">ALL STATUS</option>
+              <option value="occupied">OCCUPIED</option>
+              <option value="empty">AVAILABLE</option>
             </select>
-            <FunnelIcon className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <FunnelIcon className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
           </div>
         </div>
       </div>
 
+      {/* Grid of Units */}
       {filteredUnits.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-          <HomeIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">
-            {searchQuery || filterStatus !== "all"
-              ? "Tidak ada unit yang cocok."
-              : "Belum ada data unit."}
+        <div className="bg-slate-50/50 rounded-[40px] border-2 border-dashed border-slate-200 p-24 text-center">
+          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <ArchiveBoxIcon className="w-10 h-10 text-slate-200" />
+          </div>
+          <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-sm">
+            No units match your criteria
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredUnits.map((unit) => {
             const occupant = getOccupant(unit.id);
             const isOccupied = !!occupant;
@@ -189,73 +168,89 @@ const KelolaUnit = () => {
             return (
               <div
                 key={unit.id}
-                className={`relative p-5 rounded-xl border transition-all duration-200 ${
+                className={`group relative p-8 rounded-[40px] border transition-all duration-500 overflow-hidden ${
                   isOccupied
-                    ? "bg-red-50 border-red-200 shadow-sm"
-                    : "bg-white border-green-200 hover:shadow-md hover:border-green-300"
+                    ? "bg-white border-rose-100/50 shadow-2xl shadow-rose-900/5"
+                    : "bg-white border-emerald-100/50 hover:border-emerald-500 hover:shadow-2xl hover:shadow-emerald-900/10"
                 }`}
               >
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-2">
-                    <HomeIcon
-                      className={`w-5 h-5 ${
-                        isOccupied ? "text-red-500" : "text-green-500"
-                      }`}
-                    />
-                    <span
-                      className={`font-bold text-lg ${
-                        isOccupied ? "text-red-800" : "text-green-700"
-                      }`}
-                    >
-                      {unit.id}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full font-bold ${
-                      isOccupied
-                        ? "bg-red-100 text-red-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {isOccupied ? "TERISI" : "KOSONG"}
-                  </span>
-                </div>
+                {/* Visual Accent */}
+                <div
+                  className={`absolute top-0 right-0 w-24 h-24 rounded-bl-[60px] opacity-10 ${isOccupied ? "bg-rose-500" : "bg-emerald-500"}`}
+                ></div>
 
-                {isOccupied ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-red-900">
-                      <UserIcon className="w-4 h-4" />
-                      <span className="font-medium truncate">
-                        {occupant.nama}
-                      </span>
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="flex justify-between items-start mb-10">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                        Unit Identification
+                      </p>
+                      <h3
+                        className={`text-3xl font-black tracking-tight ${isOccupied ? "text-rose-900" : "text-emerald-900"}`}
+                      >
+                        {unit.id}
+                      </h3>
                     </div>
-                    <div className="flex gap-2 pt-2 border-t border-red-100">
-                      <button
-                        onClick={() => handlePindahClick(occupant)}
-                        className="flex-1 text-xs bg-white text-red-600 border border-red-200 py-1.5 rounded hover:bg-red-50"
-                      >
-                        Pindah
-                      </button>
-                      <button
-                        onClick={() => handleHapus(occupant)}
-                        className="flex-1 text-xs bg-red-600 text-white py-1.5 rounded hover:bg-red-700"
-                      >
-                        Hapus
-                      </button>
+                    <div
+                      className={`p-3 rounded-2xl ${isOccupied ? "bg-rose-50 text-rose-600" : "bg-emerald-50 text-emerald-600"}`}
+                    >
+                      <HomeIcon className="w-6 h-6" />
                     </div>
                   </div>
-                ) : (
-                  <div className="h-16 flex items-center justify-center text-green-600/50 text-xs italic">
-                    Siap Huni
-                  </div>
-                )}
+
+                  {isOccupied ? (
+                    <div className="mt-auto space-y-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4 group/user">
+                          <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center font-black text-rose-600 transition-transform group-hover/user:scale-110">
+                            {occupant.nama?.charAt(0)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                              Resident
+                            </p>
+                            <p className="text-sm font-black text-slate-900 truncate uppercase mt-0.5">
+                              {occupant.nama}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50">
+                        <button
+                          onClick={() => handlePindahClick(occupant)}
+                          className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-lg shadow-slate-200"
+                        >
+                          <ArrowRightStartOnRectangleIcon className="w-4 h-4" />
+                          Relocate
+                        </button>
+                        <button
+                          onClick={() => handleHapus(occupant)}
+                          className="flex items-center justify-center gap-2 px-4 py-3 bg-rose-50 text-rose-600 border border-rose-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-all active:scale-95"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                          Evict
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-auto flex flex-col items-center justify-center py-12 border-2 border-dashed border-emerald-50 rounded-[32px] group-hover:bg-emerald-50/50 transition-colors">
+                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">
+                        Status: Operational
+                      </p>
+                      <p className="text-sm font-black text-emerald-900 tracking-tight">
+                        READY TO OCCUPY
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Unit Selection Modal for Move */}
+      {/* Relocation Modal */}
       <PilihUnitModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -266,8 +261,8 @@ const KelolaUnit = () => {
         occupiedUnits={penghuni.map((p) => p.nomor_unit).filter(Boolean)}
         title={
           selectedOccupant
-            ? `Pindahkan ${selectedOccupant.nama}`
-            : "Pilih Unit Baru"
+            ? `RELOCATE: ${selectedOccupant.nama}`
+            : "CHOOSE NEW UNIT"
         }
       />
     </div>

@@ -8,6 +8,8 @@ import {
   ClockIcon,
   ExclamationCircleIcon,
   ArrowDownTrayIcon,
+  MagnifyingGlassIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 import SearchInput from "/src/components/admin/SearchInput";
 import {
@@ -21,7 +23,6 @@ const Pelaporan = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filtered list based on search
   const filteredList = laporanList.filter((laporan) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -41,7 +42,6 @@ const Pelaporan = () => {
           id: key,
           ...data[key],
         }));
-        // Sort by newest first
         dataArray.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
         setLaporanList(dataArray);
       } else {
@@ -49,7 +49,6 @@ const Pelaporan = () => {
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -58,209 +57,219 @@ const Pelaporan = () => {
       const laporanRef = ref(database, `laporan/${id}`);
       await update(laporanRef, { status: "read" });
     } catch (error) {
-      alert("Gagal mengubah status laporan.");
+      console.error(error);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus laporan ini?")) return;
+    if (!confirm("Permanently delete this report?")) return;
     try {
       const laporanRef = ref(database, `laporan/${id}`);
       await remove(laporanRef);
     } catch (error) {
-      alert("Gagal menghapus laporan.");
+      console.error(error);
     }
   };
 
-  const formatDate = (isoString) => {
-    if (!isoString) return "-";
-    const date = new Date(isoString);
-    return date.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Hapus semua laporan dengan konfirmasi ganda
   const handleHapusSemua = async () => {
-    if (laporanList.length === 0) {
-      alert("Tidak ada laporan.");
-      return;
-    }
-    if (
-      !window.confirm(
-        `Yakin ingin menghapus SEMUA ${laporanList.length} laporan?`
-      )
-    )
-      return;
-
-    if (
-      !window.confirm(
-        `KONFIRMASI KEDUA: ${laporanList.length} laporan akan dihapus secara permanen. Lanjutkan?`
-      )
-    )
-      return;
-
-    try {
-      const deletePromises = laporanList.map((laporan) => {
-        const laporanRef = ref(database, `laporan/${laporan.id}`);
-        return remove(laporanRef);
-      });
-      await Promise.all(deletePromises);
-      alert(`Berhasil menghapus ${laporanList.length} laporan.`);
-    } catch (error) {
-      alert("Gagal menghapus semua laporan: " + error.message);
+    if (laporanList.length === 0) return;
+    if (confirm(`Wipe ALL ${laporanList.length} reports?`)) {
+      try {
+        const deletePromises = laporanList.map((laporan) =>
+          remove(ref(database, `laporan/${laporan.id}`)),
+        );
+        await Promise.all(deletePromises);
+      } catch (error) {
+        alert("Gagal: " + error.message);
+      }
     }
   };
 
-  // Export ke Excel
   const handleExportExcel = async () => {
     const data = prepareDataForExport(laporanList, "laporan");
     await exportToExcel(
       data,
       LAPORAN_COLUMNS,
       "laporan_keluhan",
-      "Laporan Keluhan"
+      "Laporan Keluhan",
     );
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <div className="w-12 h-12 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+          Synchronizing reports...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-100 bg-linear-to-r from-indigo-50 to-purple-50">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-              <ExclamationCircleIcon className="w-6 h-6 text-indigo-600" />
-              Laporan Keluhan
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {filteredList.length} dari {laporanList.length} laporan
-            </p>
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-2 mt-2">
-              {laporanList.length > 0 && (
-                <button
-                  onClick={handleHapusSemua}
-                  className="flex items-center gap-1 text-xs bg-red-600 text-white px-3 py-1.5 rounded-full hover:bg-red-700 transition"
-                >
-                  <TrashIcon className="w-3 h-3" />
-                  Hapus Semua
-                </button>
-              )}
-              {laporanList.length > 0 && (
-                <button
-                  onClick={handleExportExcel}
-                  className="flex items-center gap-1 text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full hover:bg-emerald-700 transition"
-                >
-                  <ArrowDownTrayIcon className="w-3 h-3" />
-                  Export Excel
-                </button>
-              )}
-            </div>
+    <div className="space-y-10 pb-20">
+      {/* Header Section */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            Citizen Feedback
+          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-2 px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-indigo-100">
+              <ChatBubbleLeftRightIcon className="w-3.5 h-3.5" />
+              {laporanList.length} Reports Logged
+            </span>
+            {laporanList.some((l) => l.status === "unread") && (
+              <span className="flex items-center gap-2 px-4 py-1.5 bg-rose-50 text-rose-700 rounded-full text-[10px] font-black uppercase tracking-widest ring-1 ring-rose-100 animate-pulse">
+                New Alerts Detected
+              </span>
+            )}
           </div>
-          {/* Search Input */}
-          <SearchInput
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Cari nama, HP, atau isi laporan..."
-          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 shadow-lg shadow-emerald-200"
+          >
+            <ArrowDownTrayIcon className="w-4 h-4" />
+            Export Archive
+          </button>
+          <button
+            onClick={handleHapusSemua}
+            className="flex items-center gap-2 px-6 py-3 bg-white text-rose-600 border border-rose-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 transition-all active:scale-95 shadow-sm"
+          >
+            <TrashIcon className="w-4 h-4" />
+            Purge Feed
+          </button>
         </div>
       </div>
 
-      {/* Content */}
-      {filteredList.length === 0 ? (
-        <div className="p-12 text-center text-gray-400">
-          <ExclamationCircleIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-          <p>
-            {searchQuery
-              ? "Tidak ada hasil pencarian."
-              : "Belum ada laporan masuk."}
-          </p>
+      {/* Control Bar */}
+      <div className="flex-1 relative group">
+        <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+          <MagnifyingGlassIcon className="w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
         </div>
-      ) : (
-        <div className="divide-y divide-gray-100 overflow-y-auto overflow-x-auto h-96">
-          {filteredList.map((laporan) => (
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Filter by reporter name, phone number, or content keywords..."
+          className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-[24px] text-sm font-medium focus:outline-hidden focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all shadow-sm"
+        />
+      </div>
+
+      {/* Reports List */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {filteredList.length === 0 ? (
+          <div className="col-span-full bg-slate-50/50 rounded-[40px] border-2 border-dashed border-slate-200 p-24 text-center">
+            <ExclamationCircleIcon className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+            <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-sm">
+              No feedback records found
+            </p>
+          </div>
+        ) : (
+          filteredList.map((laporan) => (
             <div
               key={laporan.id}
-              className={`p-5 hover:bg-gray-50 transition ${
-                laporan.status === "unread" ? "bg-indigo-50/30" : ""
+              className={`group relative p-8 rounded-[40px] border transition-all duration-500 ${
+                laporan.status === "unread"
+                  ? "bg-white border-indigo-100 shadow-2xl shadow-indigo-900/5 ring-1 ring-indigo-50"
+                  : "bg-white border-slate-50 hover:border-slate-200"
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
-                {/* Left: Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-gray-800">
-                      {laporan.nama}
-                    </span>
-                    {laporan.status === "unread" && (
-                      <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-600 rounded-full uppercase">
-                        Baru
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
-                    <a
-                      href={`https://wa.me/62${laporan.nohp?.replace(
-                        /^0/,
-                        ""
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-emerald-600 hover:text-emerald-800 hover:underline"
-                      title="Hubungi via WhatsApp"
+              {laporan.status === "unread" && (
+                <div className="absolute top-8 right-8">
+                  <span className="flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                  </span>
+                </div>
+              )}
+
+              <div className="flex flex-col h-full gap-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-colors ${
+                        laporan.status === "unread"
+                          ? "bg-indigo-600 text-white"
+                          : "bg-slate-100 text-slate-400"
+                      }`}
                     >
-                      <PhoneIcon className="w-3 h-3" />
-                      {laporan.nohp}
-                    </a>
-                    <span className="flex items-center gap-1">
-                      <ClockIcon className="w-3 h-3" />
-                      {formatDate(laporan.tanggal)}
-                    </span>
+                      {laporan.nama?.charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 tracking-tight uppercase">
+                        {laporan.nama}
+                      </h4>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                        Verified Resident
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-3 rounded-lg border border-gray-100">
-                    {laporan.laporan}
-                  </p>
                 </div>
 
-                {/* Right: Actions */}
-                <div className="flex flex-col gap-2 shrink-0">
-                  {laporan.status === "unread" && (
-                    <button
-                      onClick={() => handleMarkAsRead(laporan.id)}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition"
-                      title="Tandai sudah dibaca"
+                <div className="flex-1">
+                  <div className="p-6 bg-slate-50 rounded-[32px] border border-slate-100/50 group-hover:bg-slate-100/50 transition-colors">
+                    <p className="text-sm text-slate-600 leading-relaxed font-medium capitalize">
+                      {laporan.laporan}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5 text-slate-400">
+                      <ClockIcon className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase tracking-tight">
+                        {laporan.tanggal
+                          ? new Date(laporan.tanggal).toLocaleString("id-ID", {
+                              day: "2-digit",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <a
+                      href={`https://wa.me/62${laporan.nohp?.replace(/^0/, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-emerald-600 hover:text-emerald-700 transition-colors"
                     >
-                      <CheckCircleIcon className="w-4 h-4" />
-                      Selesai
+                      <PhoneIcon className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase tracking-tight underline border-emerald-100 underline-offset-4">
+                        {laporan.nohp}
+                      </span>
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {laporan.status === "unread" && (
+                      <button
+                        onClick={() => handleMarkAsRead(laporan.id)}
+                        className="p-2.5 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all active:scale-95"
+                        title="Resolve Issue"
+                      >
+                        <CheckCircleIcon className="w-5 h-5" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDelete(laporan.id)}
+                      className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all active:scale-95"
+                      title="Dismiss Report"
+                    >
+                      <TrashIcon className="w-5 h-5" />
                     </button>
-                  )}
-                  <button
-                    onClick={() => handleDelete(laporan.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition"
-                    title="Hapus laporan"
-                  >
-                    <TrashIcon className="w-4 h-4" />
-                    Hapus
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 };

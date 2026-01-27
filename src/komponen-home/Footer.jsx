@@ -12,147 +12,166 @@ const Footer = () => {
   return (
     <footer
       id="kontak"
-      className="relative bg-slate-900 border-t border-slate-800 pt-20 overflow-hidden"
+      className="relative bg-slate-900 pt-24 pb-12 overflow-hidden"
     >
-      {/* Background Decor */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-linear-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+      {/* Decorative Gradient Overlay */}
+      <div className="absolute top-0 left-0 w-full h-32 bg-linear-to-b from-white to-transparent opacity-5"></div>
 
-      <div className="container mx-auto px-6 lg:px-8 pb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-          {/* Column 1: Branding */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-600 rounded-xl shadow-lg shadow-emerald-900/40">
-                <BuildingOffice2Icon className="w-8 h-8 text-white" />
+      <div className="container mx-auto px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
+          {/* Column 1: Branding & Philosophy */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-emerald-600 rounded-[20px] flex items-center justify-center shadow-2xl shadow-emerald-500/20">
+                <img
+                  src="https://rusunawadaftar.vercel.app/src/asset/img/Lambang_Kabupaten_Lombok_Timur.png"
+                  alt="Logo Lombok Timur"
+                />
               </div>
               <div>
-                <h3 className="text-xl font-black text-white leading-tight uppercase tracking-tighter">
-                  Perkim <span className="text-emerald-500">Lotim</span>
+                <h3 className="text-2xl font-black text-white leading-none tracking-tighter">
+                  PERKIM LOTIM
                 </h3>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  Official Portal
-                </p>
               </div>
             </div>
-            <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-xs">
-              Mewujudkan hunian layak, terjangkau, dan berkelanjutan bagi
-              seluruh masyarakat Kabupaten Lombok Timur melalui tata kelola yang
-              transparan.
+
+            <p className="text-slate-400 text-sm font-medium leading-relaxed">
+              Mewujudkan hunian yang inklusif, berkelanjutan, dan bermartabat
+              melalui transformasi digital pelayanan publik di Kabupaten Lombok
+              Timur.
             </p>
+
             <div className="flex items-center gap-4">
               <a
                 href="#"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-all"
+                className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-all transform hover:-translate-y-1"
               >
                 <GlobeAltIcon className="w-5 h-5" />
               </a>
-              {/* Add other social icons if needed */}
+              {/* Other social icons can be added here */}
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="space-y-6">
-            <h4 className="text-sm font-black text-white uppercase tracking-widest border-l-4 border-emerald-500 pl-3">
-              Navigasi
+          {/* Column 2: Navigation */}
+          <div className="space-y-8">
+            <h4 className="text-xs font-black text-emerald-500 uppercase tracking-widest px-4 py-1.5 border border-emerald-500/30 rounded-full inline-block">
+              Navigasi Cepat
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {[
-                "Beranda",
-                "Fasilitas",
-                "Cara Daftar",
-                "Tentang",
-                "Laporan",
+                { name: "Beranda", href: "/" },
+                { name: "Unit & Fasilitas", href: "/#fasilitas" },
+                { name: "Alur Pendaftaran", href: "/#caradaftar" },
+                { name: "Tentang Kami", href: "/#tentang" },
+                { name: "Laporan Keluhan", href: "/#laporan" },
               ].map((link) => (
-                <li key={link}>
+                <li key={link.name}>
                   <a
-                    href={`#${link.toLowerCase().replace(" ", "")}`}
-                    className="group flex items-center gap-2 text-slate-400 hover:text-emerald-400 font-medium transition-colors"
+                    href={link.href}
+                    className="group flex items-center gap-2 text-slate-400 hover:text-emerald-400 font-bold text-sm transition-all"
                   >
-                    <ChevronRightIcon className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    {link}
+                    <ChevronRightIcon className="w-4 h-4 text-emerald-600 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Column 3: Contact Info */}
-          <div className="space-y-6">
-            <h4 className="text-sm font-black text-white uppercase tracking-widest border-l-4 border-emerald-500 pl-3">
-              Kontak Resmi
+          {/* Column 3: Contact Details */}
+          <div className="space-y-8">
+            <h4 className="text-xs font-black text-emerald-500 uppercase tracking-widest px-4 py-1.5 border border-emerald-500/30 rounded-full inline-block">
+              Hubungi Kami
             </h4>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPinIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+            <div className="space-y-6">
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-emerald-900/50 transition-colors">
+                  <MapPinIcon className="w-5 h-5 text-emerald-500" />
+                </div>
                 <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                  Jl. Raya Selong, Kompleks Perkantoran, Lombok Timur, NTB 83612
+                  Jl. Raya Selong, Kompleks Perkantoran Pemerintah Daerah,
+                  Selong, Lombok Timur, 83612
                 </p>
               </div>
-              <div className="flex items-center gap-3">
-                <PhoneIcon className="w-5 h-5 text-emerald-500 shrink-0" />
-                <p className="text-slate-400 text-sm font-medium line-clamp-1">
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-emerald-900/50 transition-colors">
+                  <PhoneIcon className="w-5 h-5 text-emerald-500" />
+                </div>
+                <p className="text-slate-400 text-sm font-bold">
                   (0376) 123-456
                 </p>
               </div>
-              <div className="flex items-center gap-3">
-                <EnvelopeIcon className="w-5 h-5 text-emerald-500 shrink-0" />
-                <p className="text-slate-400 text-sm font-medium line-clamp-1">
-                  perkim@lotim.go.id
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-emerald-900/50 transition-colors">
+                  <EnvelopeIcon className="w-5 h-5 text-emerald-500" />
+                </div>
+                <p className="text-slate-400 text-sm font-bold">
+                  perkim@lotimkab.go.id
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Column 4: Operational */}
-          <div className="space-y-6">
-            <h4 className="text-sm font-black text-white uppercase tracking-widest border-l-4 border-emerald-500 pl-3">
-              Jam Layanan
+          {/* Column 4: Operational Hours */}
+          <div className="space-y-8">
+            <h4 className="text-xs font-black text-emerald-500 uppercase tracking-widest px-4 py-1.5 border border-emerald-500/30 rounded-full inline-block">
+              Waktu Operasional
             </h4>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 space-y-4">
-              <div className="flex items-start gap-3">
-                <ClockIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+            <div className="bg-slate-800/40 backdrop-blur-xl rounded-[32px] p-8 border border-slate-700/50 space-y-6">
+              <div className="flex items-start gap-4">
+                <ClockIcon className="w-6 h-6 text-emerald-500 mt-1" />
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-slate-300 uppercase">
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
                     Senin - Kamis
                   </p>
-                  <p className="text-sm font-medium text-slate-400">
-                    08:00 - 16:00 WITA
+                  <p className="text-lg font-black text-white">08:00 - 16:00</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">
+                    Waktu Indonesia Tengah
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 border-t border-slate-700/50 pt-4">
-                <ClockIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+              <div className="pt-4 border-t border-slate-700/50 flex items-start gap-4">
+                <ClockIcon className="w-6 h-6 text-teal-500 mt-1" />
                 <div className="space-y-1">
-                  <p className="text-xs font-bold text-slate-300 uppercase">
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest">
                     Jumat
                   </p>
-                  <p className="text-sm font-medium text-slate-400">
-                    08:30 - 11:30 WITA
-                  </p>
+                  <p className="text-lg font-black text-white">08:30 - 11:30</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="mt-20 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-slate-500 text-xs font-medium text-center md:text-left">
-            © {new Date().getFullYear()} Dinas Perumahan dan Kawasan Permukiman
-            Lombok Timur. Seluruh Hak Cipta Dilindungi.
-          </p>
-          <div className="flex items-center gap-6">
+        {/* Bottom Bar: Copyright & Legal */}
+        <div className="mt-20 pt-12 border-t border-slate-800/80 flex flex-col lg:flex-row justify-between items-center gap-8">
+          <div className="text-center lg:text-left space-y-2">
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em]">
+              © {new Date().getFullYear()} Dinas PERKIM Kabupaten Lombok Timur
+            </p>
+            <p className="text-[10px] text-slate-600 font-medium">
+              Sistem Informasi Manajemen Rusunawa Terintegrasi (SIMR-T)
+            </p>
+          </div>
+
+          <div className="flex items-center gap-10">
             <a
               href="#"
-              className="text-slate-500 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest transition-colors"
+              className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-emerald-500 transition-colors"
             >
               Privacy Policy
             </a>
             <a
               href="#"
-              className="text-slate-500 hover:text-emerald-500 text-xs font-bold uppercase tracking-widest transition-colors"
+              className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-emerald-500 transition-colors"
             >
-              Terms of Service
+              Term of Service
+            </a>
+            <a
+              href="#"
+              className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-emerald-500 transition-colors"
+            >
+              Accessibility
             </a>
           </div>
         </div>

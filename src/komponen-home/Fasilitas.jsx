@@ -9,160 +9,160 @@ import {
   ShoppingBagIcon,
   ArrowRightIcon,
   PhoneIcon,
+  WifiIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 
 const Fasilitas = () => {
   const fasilitasList = [
     {
       icon: HomeModernIcon,
-      title: "Unit Hunian Modern",
+      title: "Unit Modern",
       description:
-        "Unit hunian dengan desain modern, ventilasi baik, dan pencahayaan alami yang optimal",
-      color: "blue",
-    },
-    {
-      icon: BeakerIcon,
-      title: "Air Bersih 24 Jam",
-      description:
-        "Ketersediaan air bersih sepanjang hari untuk kebutuhan sehari-hari penghuni",
+        "Desain minimalis dengan optimalisasi ruang dan cahaya alami.",
       color: "emerald",
     },
     {
+      icon: BeakerIcon,
+      title: "Air Bersih",
+      description: "Sistem distribusi air bersih terjamin selama 24 jam penuh.",
+      color: "blue",
+    },
+    {
       icon: BoltIcon,
-      title: "Listrik Terjangkau",
-      description:
-        "Instalasi listrik yang aman dengan daya sesuai kebutuhan rumah tangga",
+      title: "Listrik Aman",
+      description: "Instalasi sesuai standar kelistrikan nasional yang aman.",
       color: "amber",
     },
     {
       icon: TruckIcon,
-      title: "Area Parkir Luas",
-      description:
-        "Area parkir yang luas dan aman untuk kendaraan roda dua dan roda empat",
-      color: "indigo",
+      title: "Parkir Luas",
+      description: "Area parkir terpadu untuk kendaraan roda 2 dan roda 4.",
+      color: "slate",
     },
     {
       icon: SparklesIcon,
-      title: "Ruang Terbuka Hijau",
-      description:
-        "Taman dan ruang terbuka hijau sebagai area bermain dan bersantai",
+      title: "Ruang Hijau",
+      description: "Taman asri untuk area bermain dan interaksi sosial.",
       color: "teal",
     },
     {
       icon: ShieldCheckIcon,
       title: "Keamanan 24/7",
-      description:
-        "Sistem keamanan terpadu dengan petugas keamanan yang siaga setiap saat",
+      description: "Pengawasan CCTV dan petugas keamanan yang siaga.",
       color: "rose",
     },
     {
-      icon: MoonIcon,
-      title: "Fasilitas Ibadah",
-      description:
-        "Musholla yang nyaman dan bersih untuk kegiatan keagamaan penghuni",
-      color: "purple",
+      icon: WifiIcon,
+      title: "Area Publik Wifi",
+      description: "Konektivitas internet di area bersama untuk penghuni.",
+      color: "indigo",
     },
     {
-      icon: ShoppingBagIcon,
-      title: "Area Komersial",
-      description:
-        "Ruang usaha strategis untuk kebutuhan ekonomi dan belanja sehari-hari",
-      color: "orange",
+      icon: UserGroupIcon,
+      title: "Balai Warga",
+      description: "Ruang serbaguna untuk kegiatan komunitas penghuni.",
+      color: "cyan",
     },
   ];
 
   return (
     <section
       id="fasilitas"
-      className="relative py-24 lg:py-32 overflow-hidden bg-slate-50/50"
+      className="relative py-24 lg:py-32 overflow-hidden bg-white"
     >
-      {/* Background Decor */}
-      <div className="absolute top-1/4 right-0 w-64 h-64 bg-emerald-100/40 rounded-full blur-3xl -z-10 animate-pulse"></div>
+      {/* Background Ornaments */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[0.03]">
+        <div className="absolute top-10 left-10 w-64 h-64 border-40 border-emerald-500 rounded-full"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 border-60 border-teal-500 rounded-full"></div>
+      </div>
 
-      <div className="container mx-auto px-6 lg:px-8">
+      <div className="container mx-auto px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20 animate-fadeIn">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100/50 border border-emerald-200 mb-6">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-            <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest">
-              Fasilitas Unggulan
-            </span>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-20">
+          <div className="max-w-2xl space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 animate-fadeIn">
+              <SparklesIcon className="w-5 h-5 text-emerald-600" />
+              <span className="text-xs font-black text-emerald-700 uppercase tracking-widest">
+                Ultimate Comfort
+              </span>
+            </div>
+            <h2 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.1] animate-slideUp">
+              Fasilitas Lengkap <br />
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-teal-500">
+                Tanpa Kompromi.
+              </span>
+            </h2>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 mb-6 tracking-tight">
-            Kenyamanan Hidup <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-600 to-teal-500">
-              Maksimal Untuk Anda
-            </span>
-          </h2>
-          <p className="text-slate-600 text-lg font-medium leading-relaxed">
-            Kami menghadirkan lingkungan hunian yang tidak hanya terjangkau,
-            tetapi juga didukung oleh berbagai fasilitas modern untuk menunjang
-            produktivitas dan kesejahteraan keluarga.
+          <p className="max-w-md text-slate-500 font-medium text-lg leading-relaxed animate-slideUp delay-100">
+            Kami menghadirkan standar hunian baru yang mengutamakan kualitas
+            hidup dan kemudahan akses bagi setiap penghuni.
           </p>
         </div>
 
-        {/* Facilities Grid */}
+        {/* Facilities Grid - Premium Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {fasilitasList.map((item, index) => (
             <div
               key={index}
-              className="group relative bg-white rounded-[32px] p-8 shadow-sm hover:shadow-2xl hover:shadow-emerald-100 border border-slate-100 hover:border-emerald-200 transition-all duration-500 hover:-translate-y-2"
+              className="group relative h-full bg-white rounded-[40px] p-8 border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-500 hover:-translate-y-2 overflow-hidden"
             >
-              {/* Icon Container */}
-              <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-50 transition-all duration-500">
-                <item.icon className="w-8 h-8 text-slate-600 group-hover:text-emerald-600 transition-colors" />
-              </div>
+              {/* Background Glow */}
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
 
-              {/* Content */}
-              <div className="space-y-3">
-                <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-slate-500 font-medium leading-relaxed line-clamp-3">
-                  {item.description}
-                </p>
-              </div>
+              <div className="relative z-10 space-y-6">
+                <div
+                  className={`w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-emerald-600 group-hover:shadow-lg group-hover:shadow-emerald-200`}
+                >
+                  <item.icon className="w-7 h-7 text-slate-600 group-hover:text-white transition-colors" />
+                </div>
 
-              {/* Hover Indicator */}
-              <div className="absolute bottom-6 right-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="w-8 h-1 bg-emerald-400 rounded-full"></div>
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Premium Bottom CTA */}
+        {/* Dynamic CTA Card */}
         <div className="mt-24 lg:mt-32">
-          <div className="relative group overflow-hidden bg-slate-900 rounded-[40px] p-10 lg:p-16 text-center shadow-2xl">
-            {/* Animated Background Gradients */}
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-teal-500/20 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-700"></div>
+          <div className="relative group rounded-[48px] overflow-hidden bg-slate-900 p-8 md:p-16 lg:p-20 shadow-2xl">
+            {/* Animated Mesh BG */}
+            <div className="absolute top-0 right-0 w-[60%] h-full bg-linear-to-l from-emerald-500/20 via-teal-500/10 to-transparent blur-3xl"></div>
 
-            <div className="relative z-10 max-w-3xl mx-auto space-y-8">
-              <h3 className="text-3xl lg:text-4xl font-black text-white leading-tight">
-                Mulai Kehidupan Baru Anda <br />
-                <span className="text-emerald-400">Di Rusunawa Lotim</span>
-              </h3>
-              <p className="text-slate-400 text-lg font-medium">
-                Sistem pendaftaran yang mudah dan cepat. Pastikan keluarga Anda
-                mendapatkan hunian terbaik dengan harga yang kompetitif.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <a
-                  href="/daftar"
-                  className="inline-flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-10 py-4 rounded-2xl shadow-xl shadow-emerald-900/40 hover:scale-105 active:scale-95 transition-all duration-300"
-                >
-                  Daftar Sekarang
-                  <ArrowRightIcon className="w-5 h-5" />
-                </a>
-                <a
-                  href="#kontak"
-                  className="inline-flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 text-white font-bold px-10 py-4 rounded-2xl backdrop-blur-md border border-white/10 hover:scale-105 active:scale-95 transition-all duration-300"
-                >
-                  Hubungi Admin
-                  <PhoneIcon className="w-5 h-5" />
-                </a>
+            <div className="flex flex-col justify-center items-center">
+              <div className="space-y-8 text-center">
+                <h3 className="text-3xl lg:text-5xl font-black text-white leading-tight">
+                  Wujudkan{" "}
+                  <span className="text-emerald-400">Hunian Impian</span> <br />
+                  Bersama Kami.
+                </h3>
+                <p className="text-slate-400 text-lg font-medium max-w-lg leading-relaxed">
+                  Hunian strategis dengan pengelolaan profesional untuk
+                  kenyamanan keluarga Anda di Lombok Timur.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a
+                    href="/daftar"
+                    className="inline-flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-10 py-5 rounded-3xl shadow-xl shadow-emerald-900/40 hover:scale-105 active:scale-95 transition-all duration-300"
+                  >
+                    Daftar Sekarang
+                    <ArrowRightIcon className="w-6 h-6" />
+                  </a>
+                  <a
+                    href="#kontak"
+                    className="inline-flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 text-white font-bold px-10 py-5 rounded-3xl backdrop-blur-md border border-white/10 transition-all duration-300"
+                  >
+                    Hubungi Kami
+                    <PhoneIcon className="w-6 h-6" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
