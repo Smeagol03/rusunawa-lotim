@@ -55,7 +55,7 @@ const Hero = () => {
         {/* Overlay for contrast */}
         <div className="absolute inset-0 bg-linear-to-b from-slate-950/90 via-slate-950/40 to-slate-950 z-10" />
         <img
-          src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000"
+          src="https://picsum.photos/seed/rusunawa/1920/1080"
           alt="Latar Belakang Hunian"
           className="w-full h-[130%] object-cover opacity-60 scale-105"
         />
