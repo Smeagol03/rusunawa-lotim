@@ -43,7 +43,7 @@ const Navbar = () => {
             <div className="relative">
               <img
                 alt="Logo Lombok Timur"
-                src="https://rusunawadaftar.vercel.app/src/asset/img/Lambang_Kabupaten_Lombok_Timur.png"
+                src="/logo.png"
                 className="h-10 w-auto drop-shadow-md group-hover:scale-110 transition-transform duration-300"
               />
             </div>
