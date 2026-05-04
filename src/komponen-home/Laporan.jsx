@@ -35,7 +35,8 @@ const Laporan = () => {
     try {
       const { database } = await import("/src/config/firebase");
       const { ref, push, serverTimestamp } = await import("firebase/database");
-      const { logAktivitas, TIPE_NOTIFIKASI } = await import("/src/config/notifikasi");
+      const { logAktivitas, TIPE_NOTIFIKASI } =
+        await import("/src/config/notifikasi");
 
       const laporanRef = ref(database, "laporan");
       await push(laporanRef, {
@@ -61,131 +62,142 @@ const Laporan = () => {
     }
   };
 
-  const inputClass = "block w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white transition-all disabled:opacity-50";
-  const labelClass = "text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 mb-2 block";
+  const inputClass =
+    "block w-full px-6 py-5 bg-white border-2 border-slate-200 rounded-none text-slate-950 text-sm font-medium focus:outline-none focus:border-slate-950 transition-all disabled:opacity-50 placeholder:text-slate-300";
+  const labelClass =
+    "text-[11px] font-bold text-slate-950 uppercase tracking-[0.3em] mb-4 block";
 
   return (
-    <section id="kontak" className="relative py-32 lg:py-48 bg-white overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[0.03]" 
-           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
+    <section
+      id="kontak"
+      className="relative py-32 lg:py-60 bg-white overflow-hidden border-t border-slate-100"
+    >
+      {/* Texture Overlay (Grain) */}
+      <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        <div className="flex flex-col lg:flex-row items-start gap-24">
-          
-          {/* Left Side: Info */}
-          <div className="lg:w-1/2 space-y-12">
-            <motion.div 
+      <div className="container mx-auto px-6 max-w-7xl relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
+          {/* Left Side: Swiss Header & Info */}
+          <div className="lg:col-span-5 space-y-16 lg:sticky lg:top-32">
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="space-y-8"
+              className="space-y-12"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-100">
-                <ExclamationTriangleIcon className="w-4 h-4 text-amber-600" />
-                <span className="text-[10px] font-black text-amber-700 uppercase tracking-[0.2em]">Pusat Bantuan</span>
+              <div className="flex items-center gap-4">
+                <div className="w-6 h-1 bg-slate-950" />
+                <span className="text-[11px] font-bold text-slate-950 uppercase tracking-[0.4em]">
+                  Pusat Pelaporan
+                </span>
               </div>
 
-              <h2 className="text-4xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]">
-                Ada Kendala? <br />
-                <span className="text-emerald-600 italic font-serif">Laporkan Segera.</span>
+              <h2 className="text-5xl md:text-8xl font-medium text-slate-950 tracking-tightest leading-[0.8] text-balance">
+                ADA <br />
+                KENDALA?
               </h2>
 
-              <p className="text-lg text-slate-500 font-medium leading-relaxed max-w-md">
-                Kami berkomitmen memberikan layanan terbaik. Laporkan keluhan Anda terkait fasilitas atau layanan Rusunawa.
-              </p>
+              <div className="space-y-6 border-l-4 border-emerald-500 pl-8">
+                <p className="text-xl text-slate-900 font-medium leading-tight max-w-sm text-balance">
+                  Laporkan keluhan Anda terkait fasilitas atau layanan hunian
+                  secara objektif dan transparan.
+                </p>
+                <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
+                  Kami berkomitmen untuk memproses setiap laporan dalam siklus
+                  24 jam kerja untuk menjamin kualitas hidup di Rusunawa.
+                </p>
+              </div>
             </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Utility Grid */}
+            <div className="grid grid-cols-2 gap-px bg-slate-200 border border-slate-200 overflow-hidden">
               {[
-                { icon: InformationCircleIcon, title: "Respon Cepat", desc: "Tanggapan dalam 24 jam kerja." },
-                { icon: ShieldCheckIcon, title: "Privasi Terjaga", desc: "Data dijamin kerahasiaannya." },
+                { title: "SLA", value: "24H", desc: "Respons harian" },
+                { title: "DATA", value: "SEC", desc: "Enkripsi penuh" },
               ].map((item, idx) => (
-                <motion.div 
+                <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  className="p-8 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex flex-col gap-6"
+                  className="bg-white p-8 space-y-4"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-emerald-600 shadow-sm">
-                    <item.icon className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="font-black text-slate-900 uppercase tracking-tight text-sm">{item.title}</h4>
-                    <p className="text-xs text-slate-500 font-medium leading-relaxed">{item.desc}</p>
-                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    {item.title}
+                  </p>
+                  <p className="text-4xl font-medium text-slate-950 tracking-tighter">
+                    {item.value}
+                  </p>
+                  <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                    {item.desc}
+                  </p>
                 </motion.div>
               ))}
             </div>
           </div>
 
-          {/* Right Side: Form */}
-          <div className="lg:w-1/2 w-full">
-            <motion.div 
+          {/* Right Side: Rigid Form */}
+          <div className="lg:col-span-7 w-full">
+            <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative group p-2 bg-slate-50 rounded-[3rem] border border-slate-100"
+              className="bg-slate-950 p-1 lg:p-1.5"
             >
-              <div className="relative bg-white rounded-[calc(3rem-0.5rem)] p-8 md:p-12 shadow-sm border border-white overflow-hidden">
-                
+              <div className="bg-white p-8 lg:p-16">
                 <AnimatePresence mode="wait">
                   {!isSuccess ? (
                     <motion.form
                       key="form"
                       initial={{ opacity: 1 }}
-                      exit={{ opacity: 0, y: -20 }}
+                      exit={{ opacity: 0, x: 20 }}
                       onSubmit={handleSubmit}
-                      className="space-y-8"
+                      className="space-y-12"
                     >
-                      <div className="space-y-6">
-                        <div className="relative">
-                          <label className={labelClass}>Nama Lengkap</label>
-                          <div className="absolute top-[38px] left-4 text-slate-400">
-                            <UserIcon className="w-5 h-5" />
-                          </div>
+                      <div className="space-y-10">
+                        <div>
+                          <label className={labelClass}>
+                            01. Identitas Pelapor
+                          </label>
                           <input
                             type="text"
                             name="nama"
                             value={formData.nama}
                             onChange={handleChange}
-                            placeholder="Masukkan nama Anda"
+                            placeholder="NAMA LENGKAP"
                             required
                             disabled={isSubmitting}
                             className={inputClass}
                           />
                         </div>
 
-                        <div className="relative">
-                          <label className={labelClass}>Nomor WhatsApp</label>
-                          <div className="absolute top-[38px] left-4 text-slate-400">
-                            <PhoneIcon className="w-5 h-5" />
-                          </div>
+                        <div>
+                          <label className={labelClass}>
+                            02. Kontak WhatsApp
+                          </label>
                           <input
                             type="tel"
                             name="nohp"
                             value={formData.nohp}
                             onChange={handleChange}
-                            placeholder="0812-xxxx-xxxx"
+                            placeholder="08XX XXXX XXXX"
                             required
                             disabled={isSubmitting}
                             className={inputClass}
                           />
                         </div>
 
-                        <div className="relative">
-                          <label className={labelClass}>Detail Keluhan</label>
-                          <div className="absolute top-[38px] left-4 text-slate-400">
-                            <ChatBubbleLeftRightIcon className="w-5 h-5" />
-                          </div>
+                        <div>
+                          <label className={labelClass}>
+                            03. Deskripsi Keluhan
+                          </label>
                           <textarea
                             name="laporan"
                             value={formData.laporan}
                             onChange={handleChange}
-                            placeholder="Tuliskan keluhan Anda secara detail..."
-                            rows="5"
+                            placeholder="TULISKAN KELUHAN SECARA DETAIL DAN OBJEKTIF..."
+                            rows="6"
                             required
                             disabled={isSubmitting}
                             className={`${inputClass} resize-none`}
@@ -196,45 +208,41 @@ const Laporan = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="group relative w-full flex items-center justify-center py-5 bg-slate-900 text-white font-black rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-900/20 active:scale-95 disabled:opacity-70"
+                        className="group relative w-full flex items-center justify-between px-10 py-6 bg-slate-950 text-white font-bold transition-all active:scale-[0.98] disabled:opacity-50"
                       >
-                        <div className="absolute inset-0 w-2 bg-emerald-600 transition-all duration-500 ease-out group-hover:w-full"></div>
-                        <span className="relative flex items-center gap-4 text-sm uppercase tracking-widest">
-                          {isSubmitting ? (
-                            <>
-                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                              Memproses...
-                            </>
-                          ) : (
-                            <>
-                              Kirim Laporan
-                              <PaperAirplaneIcon className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                            </>
-                          )}
+                        <span className="relative z-10 text-[11px] uppercase tracking-[0.4em]">
+                          {isSubmitting ? "Processing..." : "Lapor"}
+                        </span>
+                        <div className="absolute inset-0 bg-emerald-600 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
+                        <span className="relative z-10">
+                          <PaperAirplaneIcon className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-500" />
                         </span>
                       </button>
                     </motion.form>
                   ) : (
                     <motion.div
                       key="success"
-                      initial={{ opacity: 0, scale: 0.9 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="py-20 text-center space-y-8"
+                      className="py-24 text-center space-y-12"
                     >
-                      <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                        <CheckCircleIcon className="w-12 h-12 text-emerald-600" />
+                      <div className="w-24 h-24 bg-slate-950 flex items-center justify-center mx-auto">
+                        <CheckCircleIcon className="w-12 h-12 text-emerald-500" />
                       </div>
-                      <div className="space-y-4">
-                        <h3 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Terkirim!</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-4xl font-medium text-slate-950 tracking-tightest uppercase">
+                          Success.
+                        </h3>
                         <p className="text-slate-500 font-medium leading-relaxed max-w-xs mx-auto">
-                          Terima kasih atas laporan Anda. Tim kami akan segera menindaklanjuti.
+                          Laporan Anda telah terarsip dalam sistem. Tim teknis
+                          kami akan segera melakukan verifikasi.
                         </p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => setIsSuccess(false)}
-                        className="text-xs font-black text-emerald-600 uppercase tracking-widest hover:text-emerald-700 transition-colors"
+                        className="text-[10px] font-bold text-slate-950 uppercase tracking-[0.3em] border-b-2 border-slate-950 pb-1 hover:text-emerald-600 hover:border-emerald-600 transition-all"
                       >
-                        Kirim Laporan Lain
+                        File Another Report
                       </button>
                     </motion.div>
                   )}
