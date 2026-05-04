@@ -42,7 +42,7 @@ const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-950 px-6 py-20"
+      className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-slate-950 px-6 py-20"
     >
       {/* Texture Overlay (Grain) */}
       <div className="grain-overlay" />
@@ -50,7 +50,7 @@ const Hero = () => {
       {/* Parallax Background Layer */}
       <motion.div
         style={{ y: backgroundY }}
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none will-change-transform"
       >
         {/* Overlay for contrast */}
         <div className="absolute inset-0 bg-linear-to-b from-slate-950/90 via-slate-950/40 to-slate-950 z-10" />
