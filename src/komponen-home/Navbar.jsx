@@ -49,7 +49,7 @@ const Navbar = () => {
             </div>
             <span
               className={`text-xl font-black tracking-tight transition-colors duration-300 ${
-                isScrolled ? "text-slate-900" : "text-slate-800"
+                isScrolled ? "text-black" : "text-white"
               }`}
             >
               PERKIM <span className="text-emerald-600">LOTIM</span>
@@ -62,9 +62,7 @@ const Navbar = () => {
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             className={`-m-2.5 inline-flex items-center justify-center rounded-xl p-2.5 transition-colors ${
-              isScrolled
-                ? "text-slate-900 hover:bg-slate-100"
-                : "text-slate-800 hover:bg-white/20"
+              isScrolled ? "text-black" : "text-white"
             }`}
           >
             <span className="sr-only">Open main menu</span>
@@ -78,11 +76,10 @@ const Navbar = () => {
               key={item.name}
               href={item.href}
               className={`relative px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-full hover:bg-emerald-50 hover:text-emerald-700 group ${
-                isScrolled ? "text-slate-600" : "text-slate-700"
+                isScrolled ? "text-black" : "text-white"
               }`}
             >
               {item.name}
-              <span className="absolute inset-x-4 bottom-1 h-0.5 bg-emerald-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
             </a>
           ))}
         </div>

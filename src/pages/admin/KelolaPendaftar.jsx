@@ -271,7 +271,7 @@ const KelolaPendaftar = () => {
               ) : (
                 paginatedPendaftar.map((item) => (
                   <tr
-                    key={item.nik}
+                    key={item.id}
                     className="group hover:bg-slate-50/50 transition-colors"
                   >
                     <td className="px-8 py-6">

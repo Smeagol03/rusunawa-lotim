@@ -84,7 +84,7 @@ const KelolaPenghuni = () => {
 
   const handleSave = async (newData) => {
     try {
-      await updateDataPenghuni(newData.nik, newData);
+      await updateDataPenghuni(newData.id, newData);
       closeModal();
     } catch (error) {
       alert("Gagal menyimpan perubahan: " + error.message);
@@ -239,7 +239,7 @@ const KelolaPenghuni = () => {
               ) : (
                 paginatedPenghuni.map((item) => (
                   <tr
-                    key={item.nik}
+                    key={item.id}
                     className="group hover:bg-slate-50/50 transition-colors"
                   >
                     <td className="px-8 py-6">
