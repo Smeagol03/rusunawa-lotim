@@ -41,12 +41,9 @@ const About = () => {
   ];
 
   return (
-    <section
-      id="tentang"
-      className="relative py-32 lg:py-52 bg-white overflow-hidden"
-    >
+    <section id="tentang" className="relative py-32 lg:py-52 bg-white overflow-hidden">
       {/* Texture Overlay (Grain) */}
-      <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="grain-overlay" />
 
       <div className="container mx-auto px-6 max-w-7xl relative z-20">
         {/* Editorial Header */}

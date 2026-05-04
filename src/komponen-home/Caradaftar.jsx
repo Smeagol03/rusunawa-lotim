@@ -51,7 +51,7 @@ const Caradaftar = () => {
   return (
     <section id="caradaftar" className="relative py-32 lg:py-52 bg-white overflow-hidden">
       {/* Texture Overlay (Grain) */}
-      <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="grain-overlay" />
 
       {/* Editorial Background Element */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden opacity-[0.02] select-none z-0">

@@ -68,12 +68,9 @@ const Laporan = () => {
     "text-[11px] font-bold text-slate-950 uppercase tracking-[0.3em] mb-4 block";
 
   return (
-    <section
-      id="kontak"
-      className="relative py-32 lg:py-60 bg-white overflow-hidden border-t border-slate-100"
-    >
+    <section id="kontak" className="relative py-32 lg:py-60 bg-white overflow-hidden border-t border-slate-100">
       {/* Texture Overlay (Grain) */}
-      <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="grain-overlay" />
 
       <div className="container mx-auto px-6 max-w-7xl relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">

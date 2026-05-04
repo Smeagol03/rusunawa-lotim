@@ -45,7 +45,7 @@ const Hero = () => {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-950 px-6 py-20"
     >
       {/* Texture Overlay (Grain) */}
-      <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="grain-overlay" />
 
       {/* Parallax Background Layer */}
       <motion.div
